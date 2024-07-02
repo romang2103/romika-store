@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,20 +20,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { createUserAction } from "./actions"; // Corrected import
+
+const formSchema = z.object({
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  phoneNumber: z.string().min(9, { message: "Invalid phone number" }),
+});
 
 export default function SignUpForm() {
-
   const router = useRouter();
-
-  const formSchema = z.object({
-    firstName: z.string().min(1, { message: "First name is required" }),
-    lastName: z.string().min(1, { message: "Last name is required" }),
-    email: z.string().email({ message: "Invalid email address" }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-    phoneNumber: z.string().min(9, { message: "Invalid phone number" }),
-  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,22 +45,26 @@ export default function SignUpForm() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const response = await axios.post('/api/signup', values);
-      console.log(response.data);
-      if (response.status === 201) {
-        alert("User created successfully");
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    const response = await createUserAction(formData);
+
+    switch (response.status) {
+      case 201:
         router.push('/pages/login');
-      }
-      else if (response.status === 400) {
-        alert("User already exists");
-      } else {
-        alert(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Error creating user");
+        break;
+      case 400:
+        console.log(`Validation error: ${response.message}`);
+        break;
+      case 500:
+        console.log(response.message, response.status);
+        break;
+      default:
+        console.log('An unexpected error occurred.');
     }
   };
 
@@ -141,10 +144,10 @@ export default function SignUpForm() {
             </form>
           </Form>
           <div className="flex justify-center mt-4">
-                <Button variant="link" onClick={() => router.push('/login')}>
-                  Already have an account? Log in
-                </Button>
-              </div>
+            <Button variant="link" onClick={() => router.push('/login')}>
+              Already have an account? Log in
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

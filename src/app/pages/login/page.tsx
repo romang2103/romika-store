@@ -20,10 +20,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
+import { loginAction } from "./actions";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -31,8 +30,7 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,21 +42,23 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setErrorMessage(null);
+    const formData = new FormData();
+    Object.entries(values).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
     try {
-      const response = await axios.post('/api/login', values);
-      console.log(response.data);
-    
-      if (response.data.user.isAdmin) {
-        // Redirect to the admin dashboard
-        router.push('/pages/admin-dashboard');
+      const response = await loginAction(formData);
+
+      if (response.status === 201) {
+        const route = response.role === 'admin' ? '/pages/admin/dashboard' : '/pages/user/dashboard';
+        router.push(route);
+      } else {
+        setErrorMessage(response.message);
       }
-        else {
-      // Redirect to the dashboard or another page
-      router.push('/pages/user-dashboard');
-    }
     } catch (error) {
-      console.error(error);
-      setErrorMessage("Invalid email or password");
+      setErrorMessage('An unexpected error occurred. Please try again.');
     }
   };
 
