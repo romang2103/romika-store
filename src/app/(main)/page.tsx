@@ -5,7 +5,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { JSX, SVGProps, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import ProductList from "@/components/ProductList/page";
 import FilterModal from "@/components/FilterModal/page";
@@ -13,15 +13,30 @@ import { FilterSideBar } from "@/components/FilterSideBar/page";
 import { createSessionUseCase, getSessionUseCase } from "@/use-cases/sessionUseCases";
 
 export interface SessionData {
-    _id?: string;
     sessionId: string;
     cart: any[];
 }
 
-export async function Component({ session } : { session: SessionData }) {
-
+export default function Component() {
+  const [session, setSession] = useState<SessionData | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+
+  useEffect(() => {
+    const initializeSession = async () => {
+      try {
+        let currentSession: SessionData | { message: string; } = await getSessionUseCase();
+        if ((currentSession as { message: string; }).message === "No active session") {
+          currentSession = await createSessionUseCase();
+        }
+        setSession(currentSession as SessionData);
+      } catch (error) {
+        console.error("Error initializing session:", error);
+      }
+    };
+
+    initializeSession();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -61,22 +76,7 @@ export async function Component({ session } : { session: SessionData }) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const req = context.req;
-  const res = context.res;
-
-  let session = await getSessionUseCase(req, res);
-
-  if (!session || session.message) {
-    session = await createSessionUseCase(req, res);
-  }
-
-  return {
-    props: { session },
-  };
-}
-
-function HeartIcon(props) {
+function HeartIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -95,7 +95,7 @@ function HeartIcon(props) {
   );
 }
 
-function MenuIcon(props) {
+function MenuIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -117,7 +117,7 @@ function MenuIcon(props) {
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -137,7 +137,7 @@ function SearchIcon(props) {
   );
 }
 
-function ShoppingCartIcon(props) {
+function ShoppingCartIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -159,7 +159,7 @@ function ShoppingCartIcon(props) {
   );
 }
 
-function UserIcon(props) {
+function UserIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

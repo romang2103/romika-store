@@ -22,7 +22,6 @@ export async function fetchProducts(): Promise<ProductData[]> {
         const db = client.db('romika-db');
         const collection = db.collection('products');
         const products = await collection.find({}).toArray() as unknown as ProductData[];
-        console.log("Products: ", products);
         return products;
     } catch (error) {
         throw new Error('Error getting products from database');
