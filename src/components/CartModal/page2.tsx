@@ -1,21 +1,23 @@
-import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetClose, SheetContent } from "@/components/ui/sheet";
-import { XIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import { ScrollArea } from "../ui/scroll-area";
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/6lXTzA1AvVo
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
+import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface CartModalProps {
-    isOpen: boolean;
-    onOpenChange: (isOpen: boolean) => void;
-}
-
-const CartModal: React.FC<CartModalProps> = ({ isOpen, onOpenChange }) => {
-    return (
-        <Sheet open={isOpen} onOpenChange={onOpenChange}>
-            <SheetContent side="right" className="sm:max-w-sm">
-                <div className="flex flex-col h-full">
+export default function Component() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" className="relative z-50">
+          <ShoppingCartIcon className="h-5 w-5" />
+          <span className="ml-2 font-medium">Cart</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="bg-background">
+        <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-6 py-4 border-b">
             <h3 className="text-lg font-medium">Your Cart</h3>
             <SheetClose asChild>
@@ -85,9 +87,90 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onOpenChange }) => {
             <Button className="w-full mt-4">Proceed to Checkout</Button>
           </div>
         </div>
-            </SheetContent>
-        </Sheet>
-    );
-};
+      </SheetContent>
+    </Sheet>
+  )
+}
 
-export default CartModal;
+function MinusIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+    </svg>
+  )
+}
+
+
+function PlusIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  )
+}
+
+
+function ShoppingCartIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="8" cy="21" r="1" />
+      <circle cx="19" cy="21" r="1" />
+      <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+    </svg>
+  )
+}
+
+
+function XIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
+}

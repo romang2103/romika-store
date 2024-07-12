@@ -8,7 +8,7 @@ import { getProductList } from './action';
 import { addItemToCartUseCase } from '@/use-cases/cartUseCases';
 
 interface ProductData {
-  _id: any;
+  _id: string;
   product_id: number;
   description: string;
   price: number;
@@ -73,7 +73,7 @@ export default function ProductList() {
                   <HeartIcon className="w-5 h-5" />
                   <span className="sr-only">Like</span>
                 </Button>
-                <Button size="sm" onClick={() => addItemToCartUseCase(product)}>Add to Cart</Button>
+                <Button size="sm" onClick={() => addItemToCartUseCase(product, 1)}>Add to Cart</Button>
               </div>
             </div>
           </CardContent>

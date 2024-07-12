@@ -15,7 +15,6 @@ import CartModal from "@/components/CartModal/page";
 
 export interface SessionData {
     sessionId: string;
-    cart: any[];
 }
 
 export default function Component() {
@@ -26,10 +25,13 @@ export default function Component() {
   useEffect(() => {
     const initializeSession = async () => {
       try {
-        let currentSession: SessionData | { message: string; } = await getSessionUseCase();
-        if ((currentSession as { message: string; }).message === "No active session") {
+        let currentSession = await getSessionUseCase();
+        console.log("currentSession: ", currentSession);
+        if (!currentSession) {
+          console.log("Creating session...");
           currentSession = await createSessionUseCase();
         }
+        console.log("currentSession: ", currentSession);
         setSession(currentSession as SessionData);
       } catch (error) {
         console.error("Error initializing session:", error);
