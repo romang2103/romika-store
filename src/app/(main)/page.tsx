@@ -11,6 +11,7 @@ import ProductList from "@/components/ProductList/page";
 import FilterModal from "@/components/FilterModal/page";
 import { FilterSideBar } from "@/components/FilterSideBar/page";
 import { createSessionUseCase, getSessionUseCase } from "@/use-cases/sessionUseCases";
+import CartModal from "@/components/CartModal/page";
 
 export interface SessionData {
     sessionId: string;
@@ -72,6 +73,7 @@ export default function Component() {
         </main>
       </div>
       <FilterModal isOpen={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}/>
+      <CartModal isOpen={isCartModalOpen} onOpenChange={setIsCartModalOpen}/>
     </div>
   );
 }
