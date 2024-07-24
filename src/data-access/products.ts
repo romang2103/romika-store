@@ -27,3 +27,15 @@ export async function fetchProducts(): Promise<ProductData[]> {
         throw new Error('Error getting products from database');
     }
 }
+
+export async function getProductById(productId: number): Promise<ProductData> {
+    try {
+        const client = await clientPromise;
+        const db = client.db('romika-db');
+        const collection = db.collection('products');
+        const product = await collection.findOne({ product_id: productId }) as ProductData;
+        return product;
+    } catch (error) {
+        throw new Error('Error getting product from database');
+    }
+}

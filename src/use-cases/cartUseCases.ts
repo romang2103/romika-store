@@ -20,6 +20,9 @@ interface CartItem {
     productId: number;
     price: number;
     quantity: number;
+    image: string;
+    name: string;
+    description: string;
 }
 
 interface CartData {
@@ -38,7 +41,7 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
     const session: SessionData | null = await getSessionUseCase();
     const sessionId = session?.sessionId || '';
     // Construct cart item
-    const cartItem = { productId: product.product_id, price: product.price, quantity: quantity };
+    const cartItem = { productId: product.product_id, name: product.name, description: product.description, price: product.price, quantity: quantity, image: product.image_urls[0] };
     // Check if cart already contains item
     const existingItem = await getItemInCart(sessionId, product.product_id);
     if (existingItem) {
@@ -84,4 +87,13 @@ export async function getCartUseCase() {
     // Get cart from session
     const cart = await getCart(session?.sessionId || '');
     return { cart: cart, sessionId: session?.sessionId };
+}
+
+export async function getCartItemsUseCase() {
+    // Get user session using cookies
+    const session: SessionData | null = await getSessionUseCase();
+    // Get cart from session
+    const cart = await getCart(session?.sessionId || '');
+    // Return cart items if cart is not null
+    return cart ? cart.items : [];
 }
