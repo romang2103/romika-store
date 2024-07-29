@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { updateItemInCartQuantityUseCase } from '@/use-cases/cartUseCases';
 
 interface CartItemProps {
   cartItem: CartItemData;
+  onQuantityChange: (productId: number, quantity: number) => void;
 }
 
 interface CartItemData {
@@ -16,8 +18,12 @@ interface CartItemData {
   }
 
 
-const CartItem: React.FC<CartItemProps> = ({ cartItem }) => {
-    console.log('cartItem: ', cartItem);
+const CartItem: React.FC<CartItemProps> = ({ cartItem, onQuantityChange }) => {
+    const handleQuantityChange = async (change: number) => {
+      const updatedCart = await updateItemInCartQuantityUseCase(cartItem.productId, change);
+      onQuantityChange(cartItem.productId, change);
+    };
+
     return (
         <div className="grid gap-4">
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
@@ -33,12 +39,12 @@ const CartItem: React.FC<CartItemProps> = ({ cartItem }) => {
                   {/* <p className="text-sm text-muted-foreground">{cartItem.description}</p> */}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleQuantityChange(-1)}>
                     <MinusIcon className="h-4 w-4" />
                     <span className="sr-only">Remove</span>
                   </Button>
                   <span>{cartItem.quantity}</span>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleQuantityChange(1)}>
                     <PlusIcon className="h-4 w-4" />
                     <span className="sr-only">Add</span>
                   </Button>

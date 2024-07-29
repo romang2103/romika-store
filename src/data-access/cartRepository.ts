@@ -25,7 +25,7 @@ export async function getCart(sessionId: string) {
     const client = await clientPromise;
     const db = client.db('romika-db');
     const collection = db.collection('carts');
-    const cart = await collection.findOne({ session_id: sessionId });
+    const cart = await collection.findOne({ session_id: sessionId }) as CartData | null;
     return cart;
 }
 
@@ -44,6 +44,21 @@ export async function addItemToCart(sessionId: string, item: any) {
     console.log('Item added to cart');
 }
 
+export async function removeItemFromCart(sessionId: string, productId: number) {
+    const client = await clientPromise;
+    const db = client.db('romika-db');
+    const collection = db.collection('carts');
+    const cart = await collection.findOne({ session_id: sessionId }) as CartData | null;
+    const updatedItems = cart!.items.filter((item) => item.productId !== productId);
+    const updatedCart = {
+        ...cart!,
+        items: updatedItems,
+        total_price: cart!.total_price - updatedItems.find((item) => item.productId === productId)!.price,
+    };
+    await collection.updateOne({ session_id: sessionId }, { $set: updatedCart });
+    console.log('Item removed from cart');
+}
+
 export async function getItemInCart(sessionId: string, productId: number) {
     const client = await clientPromise;
     const db = client.db('romika-db');
@@ -58,12 +73,15 @@ export async function updateItemInCartQuantity(sessionId: string, productId: num
     const db = client.db('romika-db');
     const collection = db.collection('carts');
     const cart = await collection.findOne({ session_id: sessionId }) as CartData | null;
-    const updatedItems = cart!.items.map((item) => {
+    const updatedItems = await Promise.all(cart!.items.map(async (item) => {
         if (item.productId === productId) {
-            return { ...item, quantity: item.quantity + quantity };
+            if (item.quantity + quantity > 0) {
+                return { ...item, quantity: item.quantity + quantity };
+            }
+            await removeItemFromCart(sessionId, productId);
         }
         return item;
-    });
+    }));
     const updatedCart = {
         ...cart!,
         items: updatedItems,
@@ -71,4 +89,12 @@ export async function updateItemInCartQuantity(sessionId: string, productId: num
     };
     await collection.updateOne({ session_id: sessionId }, { $set: updatedCart });
     console.log('Item quantity updated');
+}
+
+export async function clearCart(sessionId: string) {
+    const client = await clientPromise;
+    const db = client.db('romika-db');
+    const collection = db.collection('carts');
+    await collection.updateOne({ session_id: sessionId }, { $set: { items: [], total_price: 0 } });
+    console.log('Cart cleared');
 }

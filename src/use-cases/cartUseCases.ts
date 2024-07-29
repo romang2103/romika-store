@@ -1,4 +1,4 @@
-import { addItemToCart, getCart, getItemInCart, updateItemInCartQuantity } from "@/data-access/cartRepository";
+import { addItemToCart, clearCart, getCart, getItemInCart, updateItemInCartQuantity } from "@/data-access/cartRepository";
 import { getSessionUseCase } from "./sessionUseCases";
 
 interface ProductData {
@@ -28,7 +28,7 @@ interface CartItem {
 interface CartData {
     sessionId: string;
     items: CartItem[];
-    totalPrice: number;
+    total_price: number;
 }
 
 interface SessionData {
@@ -52,32 +52,37 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
         await addItemToCart(sessionId, cartItem);
     }
     // Return updated cart
-    const updatedCart = getCart(sessionId);
+    const updatedCart = await getCart(sessionId);
     console.log('updatedCart: ', updatedCart);
     return updatedCart;
 }
 
-export async function updateItemInCartQuantityUseCase(product: ProductData, quantity: number) {
-}
-
-
-
-// Remove item from cart
-export async function removeItemFromCartUseCase() {
+// Used to add and remove items inside the cart modal
+export async function updateItemInCartQuantityUseCase(productId: number, quantity: number) {
     // Get user session using cookies
+    console.log("Updating item quantity...");
+    const session: SessionData | null = await getSessionUseCase();
     // Get cart from session
-    // Remove item from cart
-    // Save cart to session
+    const sessionId = session?.sessionId || '';
+    // Update item in cart
+    await updateItemInCartQuantity(sessionId, productId, quantity);
     // Return updated cart
+    const updatedCart = await getCart(sessionId);
+    console.log('updatedCart: ', updatedCart);
+    return updatedCart;
 }
 
 // Clear cart
 export async function clearCartUseCase() {
     // Get user session using cookies
+    const session: SessionData | null = await getSessionUseCase();
+    // Get cart from session
+    const sessionId = session?.sessionId || '';
     // Clear cart in session
-    // Return empty cart
-    // Save cart to session
-    // Return updated cart
+    await clearCart(sessionId);
+    // Return updated cart ?? Do I need to do this?
+    // const updatedCart = await getCart(sessionId);
+    // return updatedCart
 }
 
 // Get cart
@@ -86,14 +91,15 @@ export async function getCartUseCase() {
     const session: SessionData | null = await getSessionUseCase();
     // Get cart from session
     const cart = await getCart(session?.sessionId || '');
-    return { cart: cart, sessionId: session?.sessionId };
+    // return { cart: cart, sessionId: session?.sessionId };
+    return cart;
 }
 
 export async function getCartItemsUseCase() {
     // Get user session using cookies
     const session: SessionData | null = await getSessionUseCase();
     // Get cart from session
-    const cart = await getCart(session?.sessionId || '');
+    const cart  = await getCartUseCase();
     // Return cart items if cart is not null
-    return cart ? cart.items : [];
+    return cart ? cart?.items : [];
 }
