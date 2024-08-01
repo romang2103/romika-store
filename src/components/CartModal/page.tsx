@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Sheet, SheetClose, SheetContent } from "@/components/ui/sheet";
 import { XIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
-import { getCartItemsUseCase, getCartUseCase, updateItemInCartQuantityUseCase } from "@/use-cases/cartUseCases";
 import CartItem from "./CartItem/page";
-import { on } from "events";
+import { useCartStore } from "@/store/useCartStore";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -30,45 +27,17 @@ interface CartData {
 }
 
 const CartModal: React.FC<CartModalProps> = ({ isOpen, onOpenChange }) => {
-  const [CartItems, setCartItems] = useState<CartItemData[]>([]);
-  const [CartTotal, setCartTotal] = useState<number>(0);
+  const { CartItems, CartTotal, updateItemInCartQuantity, loadCart } = useCartStore();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    async function loadCartItems() {
-      try {
-        console.log("Loading cart items...");
-        const data = await getCartItemsUseCase();
-        setCartItems(data);
-        const cart = await getCartUseCase() as CartData | null;
-        console.log("Cart: ", cart);
-        if (cart) {
-          console.log('Cart: ', cart);
-          setCartTotal(cart.total_price);
-        }
-
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (isOpen) {
+      loadCart();
     }
-    console.log("Set CartItems: ", CartItems);
-    loadCartItems();
-  }, []);
+  }, [isOpen, loadCart]);
 
   const handleQuantityChange = async (productId: number, change: number) => {
-    try {
-      const updatedCart = await updateItemInCartQuantityUseCase(productId, change) as CartData | null;
-      if (updatedCart) {
-        console.log("Updated Cart Modal: ", updatedCart);
-        setCartItems(updatedCart.items);
-        setCartTotal(updatedCart.total_price);
-        console.log("Cart updated: ", CartTotal);
-      }
-    } catch (error) {
-      console.error("Error updating item quantity:", error);
-    }
+    updateItemInCartQuantity(productId, change);
   };
   
   return (

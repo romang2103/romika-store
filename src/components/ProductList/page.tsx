@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { HeartIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getProductList } from './action';
-import { addItemToCartUseCase } from '@/use-cases/cartUseCases';
+import { useCartStore } from '@/store/useCartStore';
 
 interface ProductData {
   _id: string;
@@ -25,6 +25,7 @@ interface ProductData {
 export default function ProductList() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const addItemToCart = useCartStore((state) => state.addItemToCart);
 
   useEffect(() => {
      async function loadProducts() {
@@ -73,7 +74,7 @@ export default function ProductList() {
                   <HeartIcon className="w-5 h-5" />
                   <span className="sr-only">Like</span>
                 </Button>
-                <Button size="sm" onClick={() => addItemToCartUseCase(product, 1)}>Add to Cart</Button>
+                <Button size="sm" onClick={() => addItemToCart(product)}>Add to Cart</Button>
               </div>
             </div>
           </CardContent>

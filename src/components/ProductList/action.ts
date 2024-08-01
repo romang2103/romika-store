@@ -1,21 +1,7 @@
 'use server';
 
 import { fetchProducts } from "@/data-access/products";
-
-interface ProductData {
-    _id: any;
-    product_id: number;
-    description: string;
-    price: number;
-    name: string;
-    quantity: number;
-    minimum_order_quantity: number | null;
-    wholesale_price: number | null;
-    search_tags: string[];
-    characteristics: any[];
-    image_urls: string[];
-    inStock: boolean;
-}
+import { ProductData } from "@/interfaces/interfaces";
 
 export async function getProductList(): Promise<ProductData[]> {
     try {

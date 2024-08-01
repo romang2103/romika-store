@@ -1,105 +1,108 @@
-import { addItemToCart, clearCart, getCart, getItemInCart, updateItemInCartQuantity } from "@/data-access/cartRepository";
+import { clearCart, createCart, getCart, getItemInCart, updateCart } from "@/data-access/cartRepository";
 import { getSessionUseCase } from "./sessionUseCases";
-
-interface ProductData {
-    _id: string;
-    product_id: number;
-    description: string;
-    price: number;
-    name: string;
-    quantity: number;
-    minimum_order_quantity: number | null;
-    wholesale_price: number | null;
-    search_tags: string[];
-    characteristics: any[];
-    image_urls: string[];
-    inStock: boolean;
-}
-
-interface CartItem {
-    productId: number;
-    price: number;
-    quantity: number;
-    image: string;
-    name: string;
-    description: string;
-}
-
-interface CartData {
-    sessionId: string;
-    items: CartItem[];
-    total_price: number;
-}
-
-interface SessionData {
-    sessionId: string;
-}
+import { CartData, CartItem, ProductData, SessionData } from "@/interfaces/interfaces";
 
 // Add item to cart
 export async function addItemToCartUseCase(product: ProductData, quantity: number) {
-    // Get sessionId
     const session: SessionData | null = await getSessionUseCase();
     const sessionId = session?.sessionId || '';
-    // Construct cart item
-    const cartItem = { productId: product.product_id, name: product.name, description: product.description, price: product.price, quantity: quantity, image: product.image_urls[0] };
-    // Check if cart already contains item
-    const existingItem = await getItemInCart(sessionId, product.product_id);
-    if (existingItem) {
-        // Update quantity by 1
-        await updateItemInCartQuantity(sessionId, product.product_id, 1);
-    } else {
-        // Add item to cart
-        await addItemToCart(sessionId, cartItem);
+    console.log('sessionId: ', sessionId);
+
+    let existingCart = await getCart(sessionId);
+    if (!existingCart) {
+        await createCart(sessionId);
+        existingCart = await getCart(sessionId);
     }
-    // Return updated cart
-    const updatedCart = await getCart(sessionId);
-    console.log('updatedCart: ', updatedCart);
-    return updatedCart;
+
+    const existingItem = await getItemInCart(sessionId, product.product_id) as CartItem | null;
+    console.log('existingItem: ', existingItem);
+    let updatedCart;
+
+    if (existingItem) {
+        updatedCart = {
+            ...existingCart!,
+            items: existingCart!.items?.map(item =>
+                item.productId === product.product_id ? { ...item, quantity: item.quantity + quantity } : item
+            ),
+            total_price: existingCart!.total_price + product.price * quantity
+        };
+    } else {
+        const cartItem: CartItem = {
+            productId: product.product_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            quantity: quantity,
+            image: product.image_urls[0]
+        };
+
+        updatedCart = {
+            ...existingCart!,
+            items: [...existingCart!.items, cartItem],
+            total_price: existingCart!.total_price + cartItem.price * cartItem.quantity
+        };
+    }
+    console.log(updatedCart);
+
+    await updateCart(sessionId, updatedCart);
+
+    const updatedCartData = await getCart(sessionId);
+    console.log('updatedCart: ', updatedCartData);
+    return updatedCartData;
 }
 
 // Used to add and remove items inside the cart modal
 export async function updateItemInCartQuantityUseCase(productId: number, quantity: number) {
-    // Get user session using cookies
-    console.log("Updating item quantity...");
     const session: SessionData | null = await getSessionUseCase();
-    // Get cart from session
     const sessionId = session?.sessionId || '';
-    // Update item in cart
-    await updateItemInCartQuantity(sessionId, productId, quantity);
-    // Return updated cart
-    const updatedCart = await getCart(sessionId);
-    console.log('updatedCart: ', updatedCart);
-    return updatedCart;
+    
+    const existingCart = await getCart(sessionId);
+    if (!existingCart) throw new Error("Cart not found");
+
+    let updatedCart: CartData;
+
+    const existingItem = existingCart.items.find(item => item.productId === productId);
+    if (!existingItem) throw new Error("Item not found in cart");
+
+    if (existingItem.quantity + quantity <= 0) {
+        updatedCart = {
+            ...existingCart,
+            items: existingCart.items.filter(item => item.productId !== productId),
+            total_price: existingCart.total_price - existingItem.price * existingItem.quantity
+        };
+    } else {
+        updatedCart = {
+            ...existingCart,
+            items: existingCart.items.map(item =>
+                item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item
+            ),
+            total_price: existingCart.total_price + existingItem.price * quantity
+        };
+    }
+
+    await updateCart(sessionId, updatedCart);
+
+    const updatedCartData = await getCart(sessionId);
+    console.log('updatedCart: ', updatedCartData);
+    return updatedCartData;
 }
 
 // Clear cart
 export async function clearCartUseCase() {
-    // Get user session using cookies
     const session: SessionData | null = await getSessionUseCase();
-    // Get cart from session
     const sessionId = session?.sessionId || '';
-    // Clear cart in session
     await clearCart(sessionId);
-    // Return updated cart ?? Do I need to do this?
-    // const updatedCart = await getCart(sessionId);
-    // return updatedCart
 }
 
 // Get cart
 export async function getCartUseCase() {
-    // Get user session using cookies
     const session: SessionData | null = await getSessionUseCase();
-    // Get cart from session
     const cart = await getCart(session?.sessionId || '');
-    // return { cart: cart, sessionId: session?.sessionId };
     return cart;
 }
 
+// Get cart items
 export async function getCartItemsUseCase() {
-    // Get user session using cookies
-    const session: SessionData | null = await getSessionUseCase();
-    // Get cart from session
-    const cart  = await getCartUseCase();
-    // Return cart items if cart is not null
-    return cart ? cart?.items : [];
+    const cart = await getCartUseCase();
+    return cart ? cart.items : [];
 }
