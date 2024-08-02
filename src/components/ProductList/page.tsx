@@ -6,21 +6,7 @@ import { HeartIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getProductList } from './action';
 import { useCartStore } from '@/store/useCartStore';
-
-interface ProductData {
-  _id: string;
-  product_id: number;
-  description: string;
-  price: number;
-  name: string;
-  quantity: number;
-  minimum_order_quantity: number | null;
-  wholesale_price: number | null;
-  search_tags: string[];
-  characteristics: any[];
-  image_urls: string[];
-  inStock: boolean;
-}
+import { ProductData } from '@/interfaces/interfaces';
 
 export default function ProductList() {
   const [products, setProducts] = useState<ProductData[]>([]);

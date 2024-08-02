@@ -4,10 +4,7 @@ import { getSession, createSession } from "../data-access/sessionRepository";
 import { v4 as uuidv4 } from "uuid";
 import { cookies } from 'next/headers';
 import { createCart } from "@/data-access/cartRepository";
-
-export interface SessionData {
-    sessionId: string;
-}
+import { SessionData } from "@/interfaces/interfaces";
 
 export async function getSessionUseCase() {
     try {

@@ -1,6 +1,6 @@
 import { clearCart, createCart, getCart, getItemInCart, updateCart } from "@/data-access/cartRepository";
 import { getSessionUseCase } from "./sessionUseCases";
-import { CartData, CartItem, ProductData, SessionData } from "@/interfaces/interfaces";
+import { CartData, CartItemData, ProductData, SessionData } from "@/interfaces/interfaces";
 
 // Add item to cart
 export async function addItemToCartUseCase(product: ProductData, quantity: number) {
@@ -14,7 +14,7 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
         existingCart = await getCart(sessionId);
     }
 
-    const existingItem = await getItemInCart(sessionId, product.product_id) as CartItem | null;
+    const existingItem = await getItemInCart(sessionId, product.product_id) as CartItemData | null;
     console.log('existingItem: ', existingItem);
     let updatedCart;
 
@@ -27,7 +27,7 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
             total_price: existingCart!.total_price + product.price * quantity
         };
     } else {
-        const cartItem: CartItem = {
+        const cartItem: CartItemData = {
             productId: product.product_id,
             name: product.name,
             description: product.description,

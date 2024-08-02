@@ -5,25 +5,11 @@ import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import CartItem from "./CartItem/page";
 import { useCartStore } from "@/store/useCartStore";
+import { CartItemData } from "@/interfaces/interfaces";
 
 interface CartModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-}
-
-interface CartItemData {
-  productId: number;
-  price: number;
-  quantity: number;
-  image: string;
-  name: string;
-  description: string;
-}
-
-interface CartData {
-  sessionId: string;
-  items: CartItemData[];
-  total_price: number;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ isOpen, onOpenChange }) => {

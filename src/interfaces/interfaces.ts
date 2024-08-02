@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-export interface CartItem {
+export interface CartItemData {
     productId: number;
     price: number;
     quantity: number;
@@ -11,7 +11,7 @@ export interface CartItem {
 
 export interface CartData {
     sessionId: string;
-    items: CartItem[];
+    items: CartItemData[];
     total_price: number;
 }
 

@@ -12,10 +12,7 @@ import FilterModal from "@/components/FilterModal/page";
 import { FilterSideBar } from "@/components/FilterSideBar/page";
 import { createSessionUseCase, getSessionUseCase } from "@/use-cases/sessionUseCases";
 import CartModal from "@/components/CartModal/page";
-
-export interface SessionData {
-    sessionId: string;
-}
+import { SessionData } from "@/interfaces/interfaces";
 
 export default function Component() {
   const [session, setSession] = useState<SessionData | null>(null);

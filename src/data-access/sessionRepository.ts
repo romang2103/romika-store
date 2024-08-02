@@ -1,12 +1,7 @@
 'use server';
 
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
-
-export interface SessionData {
-    _id?: ObjectId;
-    sessionId: string;
-}
+import { SessionData } from "@/interfaces/interfaces";
 
 export async function createSession(sessionId: string): Promise<SessionData> {
     const client = await clientPromise;
