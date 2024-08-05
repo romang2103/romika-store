@@ -1,11 +1,14 @@
 import { addItemToCartUseCase, clearCartUseCase, getCartItemsUseCase, getCartUseCase, updateItemInCartQuantityUseCase } from '@/use-cases/cartUseCases';
 import { getSessionUseCase } from '@/use-cases/sessionUseCases';
 import { create } from 'zustand';
-import { CartItem, ProductData } from '@/interfaces/interfaces';
+import { CartItemData, ProductData } from '@/interfaces/interfaces';
 
 interface CartState {
-  CartItems: CartItem[];
+  CartItems: CartItemData[];
   CartTotal: number;
+  isCartModalOpen: boolean,
+  openCartModal: () => void;
+  closeCartModal: () => void;
   addItemToCart: (item: ProductData) => void;
   updateItemInCartQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
@@ -15,6 +18,9 @@ interface CartState {
 export const useCartStore = create<CartState>((set) => ({
   CartItems: [],
   CartTotal: 0,
+  isCartModalOpen: false,
+  openCartModal: () => set(() => ({ isCartModalOpen: true })),
+  closeCartModal: () => set(() => ({ isCartModalOpen: false })),
   addItemToCart: async (item) => {
     const existingItems = await getCartItemsUseCase();
 

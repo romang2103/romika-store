@@ -11,7 +11,7 @@ import { ProductData } from '@/interfaces/interfaces';
 export default function ProductList() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const addItemToCart = useCartStore((state) => state.addItemToCart);
+  const { addItemToCart, openCartModal } = useCartStore();
 
   useEffect(() => {
      async function loadProducts() {
@@ -27,6 +27,12 @@ export default function ProductList() {
 
     loadProducts();
   }, []);
+
+  const handleAddItemToCart = async (product: ProductData) => {
+    await addItemToCart(product);
+    openCartModal();
+  }
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -46,7 +52,7 @@ export default function ProductList() {
               <div>
                 <h3 className="text-lg font-semibold">{product.name}</h3>
                 {/* <p className="text-gray-600">{product.description}</p> */}
-                <p className="mt-2 text-xl font-bold">{product.price} rub</p>
+                <p className="mt-2 text-xl font-bold">{product.price.toFixed(2)} rub</p>
                 <span
                   className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${
                     product.inStock ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
@@ -60,7 +66,7 @@ export default function ProductList() {
                   <HeartIcon className="w-5 h-5" />
                   <span className="sr-only">Like</span>
                 </Button>
-                <Button size="sm" onClick={() => addItemToCart(product)}>Add to Cart</Button>
+                <Button size="sm" onClick={() => handleAddItemToCart(product)}>Add to Cart</Button>
               </div>
             </div>
           </CardContent>

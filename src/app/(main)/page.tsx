@@ -13,11 +13,14 @@ import { FilterSideBar } from "@/components/FilterSideBar/page";
 import { createSessionUseCase, getSessionUseCase } from "@/use-cases/sessionUseCases";
 import CartModal from "@/components/CartModal/page";
 import { SessionData } from "@/interfaces/interfaces";
+import { useCartStore } from "@/store/useCartStore";
+// import { HeartIcon, MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
 
 export default function Component() {
   const [session, setSession] = useState<SessionData | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  // const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const { isCartModalOpen, openCartModal } = useCartStore();
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -52,7 +55,7 @@ export default function Component() {
         </div>
         <div className="flex items-center space-x-4">
           <UserIcon className="w-6 h-6" />
-          <button onClick={() => setIsCartModalOpen(true)}>
+          <button onClick={() => openCartModal()}>
             <ShoppingCartIcon className="w-6 h-6" />
           </button>
         </div>
@@ -72,7 +75,7 @@ export default function Component() {
         </main>
       </div>
       <FilterModal isOpen={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}/>
-      <CartModal isOpen={isCartModalOpen} onOpenChange={setIsCartModalOpen}/>
+      <CartModal isOpen={isCartModalOpen} onOpenChange={openCartModal}/>
     </div>
   );
 }

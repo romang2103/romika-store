@@ -55,7 +55,7 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
 export async function updateItemInCartQuantityUseCase(productId: number, quantity: number) {
     const session: SessionData | null = await getSessionUseCase();
     const sessionId = session?.sessionId || '';
-    
+
     const existingCart = await getCart(sessionId);
     if (!existingCart) throw new Error("Cart not found");
 
@@ -105,4 +105,10 @@ export async function getCartUseCase() {
 export async function getCartItemsUseCase() {
     const cart = await getCartUseCase();
     return cart ? cart.items : [];
+}
+
+// Check if cart is valid (not empty - for checkout button)
+export async function isCartValidUseCase() {
+    const cart = await getCartUseCase();
+    return cart && cart.items.length > 0;
 }
