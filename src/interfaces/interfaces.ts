@@ -34,3 +34,8 @@ export interface SessionData {
     _id?: ObjectId;
     sessionId: string;
 }
+
+export interface FilterOptionData {
+    _id?: ObjectId;
+    name: string;
+}
