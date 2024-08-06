@@ -36,6 +36,6 @@ export interface SessionData {
 }
 
 export interface FilterOptionData {
-    _id?: ObjectId;
+    _id: ObjectId;
     name: string;
 }

@@ -1,14 +1,15 @@
 import { create } from 'zustand';
 import { CartItemData, ProductData } from '@/interfaces/interfaces';
+import { ObjectId } from 'mongodb';
 
 interface FilterState {
-    Filters: string[];
+    Filters: ObjectId[];
     isFilterModalOpen: boolean;
     openFilterModal: () => void;
     closeFilterModal: () => void;
-    addFilter: (filter: string) => void;
-    clearFilter: () => void;
-    // loadFilters: () => void;
+    addFilter: (filter: ObjectId) => void;
+    removeFilter: (filter: ObjectId) => void;
+    clearFilters: () => void;
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
@@ -16,9 +17,7 @@ export const useFilterStore = create<FilterState>((set) => ({
     isFilterModalOpen: false,
     openFilterModal: () => set(() => ({ isFilterModalOpen: true })),
     closeFilterModal: () => set(() => ({ isFilterModalOpen: false })),
-    addFilter: (filter: string) => set((state) => ({ Filters: [...state.Filters, filter] })),
-    clearFilter: () => set(() => ({ Filters: [] })),
-    // loadFilters: async () => {
-    //     set({ Filters: filters });
-    // }
+    clearFilters: () => set(() => ({ Filters: [] })),
+    addFilter: (filter: ObjectId) => set((state) => ({ Filters: [...state.Filters, filter] })),
+    removeFilter: (filter: ObjectId) => set((state) => ({ Filters: state.Filters.filter((f) => f !== filter) })),
 }));

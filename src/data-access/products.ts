@@ -1,6 +1,7 @@
 'use server';
 
 import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 interface ProductData {
     _id: any;
@@ -16,7 +17,7 @@ interface ProductData {
     image_urls: string[];
 }
 
-export async function fetchProducts(): Promise<ProductData[]> {
+export async function fetchProducts(filters: ObjectId[]): Promise<ProductData[]> {
     try {
         const client = await clientPromise;
         const db = client.db('romika-db');

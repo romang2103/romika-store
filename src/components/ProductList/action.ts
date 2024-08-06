@@ -2,10 +2,11 @@
 
 import { fetchProducts } from "@/data-access/products";
 import { ProductData } from "@/interfaces/interfaces";
+import { ObjectId } from "mongodb";
 
-export async function getProductList(): Promise<ProductData[]> {
+export async function getProductList(filters: ObjectId[]): Promise<ProductData[]> {
     try {
-        const products = await fetchProducts();
+        const products = await fetchProducts(filters);
         console.log("Products fetched successfully");
         const productList = products.map((product) => ({
             _id: product._id.toString(), // Convert _id to string

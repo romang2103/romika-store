@@ -7,16 +7,27 @@ import { useState, useEffect } from 'react';
 import { getProductList } from './action';
 import { useCartStore } from '@/store/useCartStore';
 import { ProductData } from '@/interfaces/interfaces';
+import { useFilterStore } from '@/store/useFilterStore';
+import { useSearchParams } from 'next/navigation'
 
 export default function ProductList() {
+  const searchParams = useSearchParams();
+
+  const page = searchParams.get('page') ?? 1;
+  const PRODUCTS_PER_PAGE = 10;
+  
+  const start = (Number(page) - 1) * PRODUCTS_PER_PAGE;
+
+
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { addItemToCart, openCartModal } = useCartStore();
+  const { Filters } = useFilterStore();
 
   useEffect(() => {
      async function loadProducts() {
       try {
-        const data = await getProductList();
+        const data = await getProductList(Filters);
         setProducts(data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -26,7 +37,7 @@ export default function ProductList() {
     };
 
     loadProducts();
-  }, []);
+  }, [Filters]);
 
   const handleAddItemToCart = async (product: ProductData) => {
     await addItemToCart(product);
@@ -52,7 +63,7 @@ export default function ProductList() {
               <div>
                 <h3 className="text-lg font-semibold">{product.name}</h3>
                 {/* <p className="text-gray-600">{product.description}</p> */}
-                <p className="mt-2 text-xl font-bold">{product.price.toFixed(2)} rub</p>
+                <p className="mt-2 text-xl font-bold">{product.price} rub</p>
                 <span
                   className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${
                     product.inStock ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
