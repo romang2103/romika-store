@@ -24,6 +24,7 @@ export interface ProductData {
     quantity: number;
     minimum_order_quantity: number | null;
     wholesale_price: number | null;
+    categories: string[];
     search_tags: string[];
     characteristics: any[];
     image_urls: string[];
@@ -37,5 +38,6 @@ export interface SessionData {
 
 export interface FilterOptionData {
     _id: ObjectId;
+    id: number;
     name: string;
 }

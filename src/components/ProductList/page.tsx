@@ -34,9 +34,12 @@ export default function ProductList() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('filters:', Filters);
     async function loadProducts() {
       try {
+        console.log('trying to load products');
         const data = await getProductList(Filters);
+        handlePageChange(1);
         setProducts(data);
         setTotalProducts(data.length);
         setTotalPages(Math.ceil(data.length / productsPerPage));

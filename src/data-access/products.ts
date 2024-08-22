@@ -12,12 +12,13 @@ interface ProductData {
     quantity: number;
     minimum_order_quantity: number | null;
     wholesale_price: number | null;
+    categories: string[];
     search_tags: string[];
     characteristics: any[]; // Update this type to match the actual type of characteristics
     image_urls: string[];
 }
 
-export async function fetchProducts(filters: ObjectId[]): Promise<ProductData[]> {
+export async function fetchProducts(): Promise<ProductData[]> {
     try {
         const client = await clientPromise;
         const db = client.db('romika-db');
