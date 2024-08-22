@@ -28,7 +28,7 @@ export default function ProductList() {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(5);
   const [totalProducts, setTotalProducts] = useState<number>(48);
-  const [productsPerPage] = useState<number>(9);
+  const [productsPerPage] = useState<number>(20);
   const [productsOnPage, setProductsOnPage] = useState<ProductData[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -77,7 +77,7 @@ export default function ProductList() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {productsOnPage.map((product) => (
         <Card
           key={product.product_id}
