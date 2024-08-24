@@ -4,7 +4,7 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
 interface ProductData {
-    _id: any;
+    _id: ObjectId;
     product_id: number;
     description: string;
     price: number;

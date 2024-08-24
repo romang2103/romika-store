@@ -8,6 +8,7 @@ import { getProductList } from "./action";
 import { useCartStore } from "@/store/useCartStore";
 import { ProductData } from "@/interfaces/interfaces";
 import { useFilterStore } from "@/store/useFilterStore";
+import { useProductStore } from "@/store/useProductStore";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Pagination,
@@ -18,29 +19,40 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { getAllProducts } from "@/use-cases/productUseCases";
 
 export default function ProductList() {
-  const [products, setProducts] = useState<ProductData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const {
+    products,
+    loading,
+    filteredProducts,
+    searchTerm,
+    setProducts,
+    setFilteredProducts,
+    setLoading,
+    setSearchTerm,
+    fetchProducts,
+    filterProducts,
+    searchProducts,
+  } = useProductStore();
   const { addItemToCart, openCartModal } = useCartStore();
   const { Filters } = useFilterStore();
 
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(5);
   const [totalProducts, setTotalProducts] = useState<number>(48);
-  const [productsPerPage] = useState<number>(20);
+  const [productsPerPage] = useState<number>(8);
   const [productsOnPage, setProductsOnPage] = useState<ProductData[]>([]);
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useRouter();   
 
   useEffect(() => {
-    console.log('filters:', Filters);
     async function loadProducts() {
       try {
-        console.log('trying to load products');
-        const data = await getProductList(Filters);
-        handlePageChange(1);
+        console.log("trying to load products");
+        const data = await getAllProducts();
         setProducts(data);
+        setFilteredProducts(data);
         setTotalProducts(data.length);
         setTotalPages(Math.ceil(data.length / productsPerPage));
       } catch (error) {
@@ -51,17 +63,38 @@ export default function ProductList() {
     }
 
     loadProducts();
+  }, []);
+
+  useEffect(() => {
+    async function loadFilteredProducts() {
+      try {
+        setLoading(true);
+        console.log("trying to load filtered products");
+        await filterProducts(Filters);
+      } catch (error) {
+        console.error("Error fetching filtered products: ", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadFilteredProducts();
   }, [Filters]);
+
+  useEffect(() => {
+    setTotalProducts(filteredProducts.length);
+    setTotalPages(Math.ceil(filteredProducts.length / productsPerPage));
+  }, [filteredProducts]);
 
   useEffect(() => {
     const page = Number(searchParams.get("page")) || 1;
     const start = (page - 1) * productsPerPage;
     const end = start + productsPerPage;
 
-    const entries = products.slice(start, end);
+    const entries = filteredProducts.slice(start, end);
     setProductsOnPage(entries);
     setPage(page);
-  }, [searchParams, products]);
+  }, [searchParams, filteredProducts]);
 
   const handlePageChange = (newPage: number) => {
     router.push(`/?page=${newPage}`);
@@ -147,7 +180,7 @@ export default function ProductList() {
               .map((_, index) => index + 1)
               .filter(
                 (pageNumber) =>
-                  (pageNumber >= page - 2 && pageNumber <= page + 2)
+                  pageNumber >= page - 2 && pageNumber <= page + 2,
               )
               .map((pageNumber) => (
                 <PaginationItem key={pageNumber}>

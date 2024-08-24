@@ -11,7 +11,7 @@ export async function getProductList(filters: number[]): Promise<ProductData[]> 
         // If no filters are provided, return all products
         if (filters.length === 0) {
             return products.map(product => ({
-                _id: product._id.toString(), // Convert _id to string
+                _id: product._id,
                 product_id: product.product_id,
                 description: product.description,
                 price: product.price,
@@ -37,7 +37,7 @@ export async function getProductList(filters: number[]): Promise<ProductData[]> 
         const filteredProductList: ProductData[] = products
             .filter(product => product.categories.some(category => stringFilters.includes(category)))
             .map(product => ({
-                _id: product._id.toString(), // Convert _id to string
+                _id: product._id,
                 product_id: product.product_id,
                 description: product.description,
                 price: product.price,

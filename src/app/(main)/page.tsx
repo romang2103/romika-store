@@ -15,14 +15,13 @@ import CartModal from "@/components/CartModal/page";
 import { SessionData } from "@/interfaces/interfaces";
 import { useCartStore } from "@/store/useCartStore";
 import { useFilterStore } from "@/store/useFilterStore";
-// import { HeartIcon, MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
+import { useProductStore } from "@/store/useProductStore";
 
 export default function Component() {
   const [session, setSession] = useState<SessionData | null>(null);
-  // const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  // const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const { isFilterModalOpen, openFilterModal } = useFilterStore();
   const { isCartModalOpen, openCartModal } = useCartStore();
+  const { setSearchTerm, searchProducts, filteredProducts, loading } = useProductStore();
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -42,6 +41,11 @@ export default function Component() {
 
     initializeSession();
   }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    searchProducts();
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -71,9 +75,10 @@ export default function Component() {
               type="search"
               placeholder="Search products..."
               className="w-full pl-10 pr-4 py-2 border rounded-md"
+              onChange={handleSearch}
             />
           </div>
-          <ProductList />
+          <ProductList/>
         </main>
       </div>
       <FilterModal isOpen={isFilterModalOpen} onOpenChange={openFilterModal}/>

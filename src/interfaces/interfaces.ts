@@ -16,7 +16,7 @@ export interface CartData {
 }
 
 export interface ProductData {
-    _id: string;
+    _id: ObjectId;
     product_id: number;
     description: string;
     price: number;

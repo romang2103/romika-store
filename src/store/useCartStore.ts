@@ -1,12 +1,18 @@
-import { addItemToCartUseCase, clearCartUseCase, getCartItemsUseCase, getCartUseCase, updateItemInCartQuantityUseCase } from '@/use-cases/cartUseCases';
-import { getSessionUseCase } from '@/use-cases/sessionUseCases';
-import { create } from 'zustand';
-import { CartItemData, ProductData } from '@/interfaces/interfaces';
+import {
+  addItemToCartUseCase,
+  clearCartUseCase,
+  getCartItemsUseCase,
+  getCartUseCase,
+  updateItemInCartQuantityUseCase,
+} from "@/use-cases/cartUseCases";
+import { getSessionUseCase } from "@/use-cases/sessionUseCases";
+import { create } from "zustand";
+import { CartItemData, ProductData } from "@/interfaces/interfaces";
 
 interface CartState {
   CartItems: CartItemData[];
   CartTotal: number;
-  isCartModalOpen: boolean,
+  isCartModalOpen: boolean;
   openCartModal: () => void;
   closeCartModal: () => void;
   addItemToCart: (item: ProductData) => void;
@@ -24,7 +30,9 @@ export const useCartStore = create<CartState>((set) => ({
   addItemToCart: async (item) => {
     const existingItems = await getCartItemsUseCase();
 
-    const itemExists = existingItems.some((existingItem) => existingItem.productId === item.product_id);
+    const itemExists = existingItems.some(
+      (existingItem) => existingItem.productId === item.product_id,
+    );
 
     if (itemExists) {
       await updateItemInCartQuantityUseCase(item.product_id, 1);
