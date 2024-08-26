@@ -26,6 +26,7 @@ export default function ProductList() {
     products,
     loading,
     filteredProducts,
+    searchedProducts,
     searchTerm,
     setProducts,
     setFilteredProducts,
@@ -33,7 +34,7 @@ export default function ProductList() {
     setSearchTerm,
     fetchProducts,
     filterProducts,
-    searchProducts,
+    // searchProducts,
   } = useProductStore();
   const { addItemToCart, openCartModal } = useCartStore();
   const { Filters } = useFilterStore();
@@ -71,6 +72,7 @@ export default function ProductList() {
         setLoading(true);
         console.log("trying to load filtered products");
         await filterProducts(Filters);
+        handlePageChange(1);
       } catch (error) {
         console.error("Error fetching filtered products: ", error);
       } finally {
@@ -79,12 +81,12 @@ export default function ProductList() {
     }
     
     loadFilteredProducts();
-  }, [Filters]);
+  }, [Filters, searchTerm]);
 
   useEffect(() => {
     setTotalProducts(filteredProducts.length);
     setTotalPages(Math.ceil(filteredProducts.length / productsPerPage));
-  }, [filteredProducts]);
+  }, [filteredProducts, page]);
 
   useEffect(() => {
     const page = Number(searchParams.get("page")) || 1;

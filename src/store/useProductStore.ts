@@ -6,24 +6,28 @@ import ProductList from "@/components/ProductList/page";
 interface ProductStore {
   products: ProductData[];
   filteredProducts: ProductData[];
+  searchedProducts: ProductData[];
   loading: boolean;
   searchTerm: string;
   setProducts: (productList: ProductData[]) => void;
   setFilteredProducts: (productList: ProductData[]) => void;
+  // setSearchedProducts: (productList: ProductData[]) => void;
   setLoading: (state: boolean) => void;
   setSearchTerm: (term: string) => void;
   filterProducts: (filters: number[]) => Promise<void>;
-  searchProducts: () => void;
+  // searchProducts: () => void;
   fetchProducts: () => Promise<void>;
 }
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
   filteredProducts: [],
+  searchedProducts: [],
   loading: true,
   searchTerm: "",
   setProducts: (productList) => set({ products: productList }),
   setFilteredProducts: (productList) => set({ filteredProducts: productList }),
+  // setSearchedProducts: (productList) => set({ searchedProducts: productList }),
   setLoading: (state) => set({ loading: state }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   fetchProducts: async (): Promise<void> => {
@@ -37,27 +41,35 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       throw error;
     }
   },
-  searchProducts: async () => {
-    const { products, searchTerm } = get();
-    const filteredProducts = products.filter((product: ProductData) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    set({ filteredProducts });
-  },
+  // searchProducts: async () => {
+  //   const searchedProducts = get().filteredProducts.filter((product: ProductData) =>
+  //     product.name.toLowerCase().includes(get().searchTerm.toLowerCase()),
+  //   );
+  //   get().setSearchedProducts(searchedProducts);
+  // },
   filterProducts: async (filters) => {
-    // Implement your filtering logic here if needed
+    const allProducts = get().products;
+    const searchTerm = get().searchTerm.toLowerCase();
+    let filteredProductList = allProducts;
+  
+    // Apply category filtering if filters are provided
     if (filters.length > 0) {
-      const stringFilters = filters.map((filter) => filter.toString());
-      const filteredProductList = get().products.filter(
-        (product: ProductData) =>
-          product.categories.some((category) =>
-            stringFilters.includes(category),
-          ),
+      const stringFilters = filters.map((filter) => filter.toString());  // Convert filters to string
+      filteredProductList = filteredProductList.filter((product: ProductData) =>
+        product.categories.some((category) => stringFilters.includes(category)),
       );
-      get().setFilteredProducts(filteredProductList);
-    } else {
-      get().setFilteredProducts(get().products);
     }
-    console.log("filters and products: ", filters, get().products.length);
+  
+    // Apply search term filtering if search term is not empty
+    if (searchTerm !== "") {
+      filteredProductList = filteredProductList.filter((product: ProductData) =>
+        product.name.toLowerCase().includes(searchTerm),
+      );
+    }
+  
+    // Set filtered products to the computed list (could be filtered by categories, search term, both, or neither)
+    get().setFilteredProducts(filteredProductList);
+  
+    console.log("filters and products: ", filters, allProducts.length);
   },
 }));

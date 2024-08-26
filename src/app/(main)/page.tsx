@@ -19,9 +19,9 @@ import { useProductStore } from "@/store/useProductStore";
 
 export default function Component() {
   const [session, setSession] = useState<SessionData | null>(null);
-  const { isFilterModalOpen, openFilterModal } = useFilterStore();
+  const { isFilterModalOpen, openFilterModal, Filters } = useFilterStore();
   const { isCartModalOpen, openCartModal } = useCartStore();
-  const { setSearchTerm, searchProducts, filteredProducts, loading } = useProductStore();
+  const { setSearchTerm, filterProducts } = useProductStore();
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -44,7 +44,7 @@ export default function Component() {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-    searchProducts();
+    filterProducts(Filters);
   };
 
   return (
