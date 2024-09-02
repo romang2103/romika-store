@@ -6,6 +6,15 @@ import { cookies } from 'next/headers';
 import { createCart } from "@/data-access/cartRepository";
 import { SessionData } from "@/interfaces/interfaces";
 
+/**
+ * @description Retrieves a session from storage based on an active session ID cookie,
+ * logging and handling cases where no session or error is encountered, returning the
+ * session object if found successfully.
+ *
+ * @returns {object|null} A session object if it exists and was retrieved successfully,
+ * otherwise null indicating an error occurred such as no active session or session
+ * not found.
+ */
 export async function getSessionUseCase() {
     try {
         const cookieStore = cookies();
@@ -31,6 +40,15 @@ export async function getSessionUseCase() {
     }
 }
 
+/**
+ * @description Creates a new user session by generating a unique ID, creating a
+ * session document and a cart document in the database, logging the session details,
+ * setting the session ID in a cookie, and returning the created session data.
+ *
+ * @returns {object} The `session` created by calling the `createSession` function.
+ * The structure and properties of this object are determined by the implementation
+ * of `createSession`.
+ */
 export async function createSessionUseCase() {
     try {
         console.log('Creating session...');
