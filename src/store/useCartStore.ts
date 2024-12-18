@@ -48,7 +48,7 @@ export const useCartStore = create<CartState>((set) => ({
     await updateItemInCartQuantityUseCase(productId, quantity);
 
     const updatedCart = await getCartUseCase();
-    set({ CartItems: updatedCart?.items, CartTotal: updatedCart?.total_price });
+    set({ CartItems: updatedCart?.items ?? [], CartTotal: updatedCart?.total_price ?? 0 });
   },
 
   clearCart: async () => {
@@ -58,6 +58,6 @@ export const useCartStore = create<CartState>((set) => ({
   },
   loadCart: async () => {
     const cart = await getCartUseCase();
-    set({ CartItems: cart?.items, CartTotal: cart?.total_price });
+    set({ CartItems: cart?.items ?? [], CartTotal: cart?.total_price ?? 0 });
   },
 }));

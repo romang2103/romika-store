@@ -8,6 +8,5 @@ export async function getFilterOptions(): Promise<FilterOptionData[]> {
     const collection = db.collection('categories');
 
     const filterOptionsData = await collection.find({}).toArray() as FilterOptionData[];
-
     return filterOptionsData;
 }
