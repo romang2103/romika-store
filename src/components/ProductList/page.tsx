@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeartIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getProductList } from "./action";
 import { useCartStore } from "@/store/useCartStore";
 import { ProductData } from "@/interfaces/interfaces";
 import { useFilterStore } from "@/store/useFilterStore";
@@ -26,15 +25,11 @@ export default function ProductList() {
     products,
     loading,
     filteredProducts,
-    searchedProducts,
     searchTerm,
     setProducts,
     setFilteredProducts,
     setLoading,
-    setSearchTerm,
-    fetchProducts,
     filterProducts,
-    // searchProducts,
   } = useProductStore();
   const { addItemToCart, openCartModal } = useCartStore();
   const { Filters } = useFilterStore();
@@ -45,12 +40,13 @@ export default function ProductList() {
   const [productsPerPage] = useState<number>(8);
   const [productsOnPage, setProductsOnPage] = useState<ProductData[]>([]);
   const searchParams = useSearchParams();
-  const router = useRouter();   
+  const router = useRouter();
 
   useEffect(() => {
     async function loadProducts() {
       try {
-        console.log("trying to load products");
+        setLoading(true);
+        console.log("Trying to load products");
         const data = await getAllProducts();
         setProducts(data);
         setFilteredProducts(data);
@@ -64,39 +60,39 @@ export default function ProductList() {
     }
 
     loadProducts();
-  }, []);
+  }, [setLoading, setProducts, setFilteredProducts, productsPerPage]);
 
   useEffect(() => {
     async function loadFilteredProducts() {
       try {
         setLoading(true);
-        console.log("trying to load filtered products");
+        console.log("Trying to load filtered products");
         await filterProducts(Filters);
         handlePageChange(1);
       } catch (error) {
-        console.error("Error fetching filtered products: ", error);
+        console.error("Error fetching filtered products:", error);
       } finally {
         setLoading(false);
       }
     }
-    
+
     loadFilteredProducts();
-  }, [Filters, searchTerm]);
+  }, [Filters, searchTerm, filterProducts, setLoading]);
 
   useEffect(() => {
     setTotalProducts(filteredProducts.length);
     setTotalPages(Math.ceil(filteredProducts.length / productsPerPage));
-  }, [filteredProducts, page]);
+  }, [filteredProducts, productsPerPage]);
 
   useEffect(() => {
-    const page = Number(searchParams.get("page")) || 1;
-    const start = (page - 1) * productsPerPage;
+    const currentPage = Number(searchParams.get("page")) || 1;
+    const start = (currentPage - 1) * productsPerPage;
     const end = start + productsPerPage;
 
     const entries = filteredProducts.slice(start, end);
     setProductsOnPage(entries);
-    setPage(page);
-  }, [searchParams, filteredProducts]);
+    setPage(currentPage);
+  }, [searchParams, filteredProducts, productsPerPage]);
 
   const handlePageChange = (newPage: number) => {
     router.push(`/?page=${newPage}`);
@@ -107,50 +103,74 @@ export default function ProductList() {
     openCartModal();
   };
 
+  const handleOpenProductPage = async (product: ProductData) => {
+    router.push(`/pages/product-page?id=${product.product_id}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
       {productsOnPage.map((product) => (
         <Card
           key={product.product_id}
-          className="bg-white rounded-lg shadow-md"
+          className="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col"
         >
-          <CardContent className="p-4">
-            <img
-              src={product.image_urls[0]}
-              alt={product.name}
-              className="w-full h-64 md:h-80 lg:h-96 object-cover mb-4 rounded-md"
-            />
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold">{product.name}</h3>
-                <p className="mt-2 text-xl font-bold">{product.price} rub</p>
-                <span
-                  className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${
-                    product.inStock
-                      ? "bg-green-500 text-white"
-                      : "bg-red-500 text-white"
-                  }`}
-                >
-                  {product.inStock ? "In Stock" : "Out of Stock"}
-                </span>
-              </div>
-              <div className="flex flex-col items-end space-y-2">
+          <CardContent className="flex flex-col flex-1 p-4">
+            {/* Image Container */}
+            <div className="w-full h-48 flex items-center justify-center bg-gray-100 mb-4 rounded-md cursor-pointer">
+              <img
+                src={product.image_urls[0]}
+                alt={product.name}
+                className="max-h-full max-w-full object-contain"
+                onClick={() => handleOpenProductPage(product)}
+              />
+            </div>
+
+            {/* Product Name */}
+            <h3
+              className="text-lg font-semibold cursor-pointer border sm:h-20 md:h-14 lg:h-22 line-clamp-2 hover:underline"
+              onClick={() => handleOpenProductPage(product)}
+            >
+              {product.name}
+            </h3>
+
+            {/* Product Price */}
+            <p className="mt-2 text-xl font-bold">{product.price} rub</p>
+
+            {/* Spacer to push the final row to the bottom */}
+            <div className="mt-4 flex-grow"></div>
+
+            {/* Final Row with Responsive Layout */}
+            <div className="flex flex-row justify-between lg:flex-col items-center lg:items-end justify-end gap-2 mt-4 w-full">
+              {/* Buttons Container */}
+              <div className="flex items-center space-x-2 order-2 lg:order-1">
+                <Button size="sm" onClick={() => handleAddItemToCart(product)}>
+                  Add to Cart
+                </Button>
                 <Button
                   variant="outline"
                   size="icon"
                   className="text-gray-500 hover:text-red-500"
+                  onClick={() => { /* Implement like functionality here */ }}
                 >
                   <HeartIcon className="w-5 h-5" />
                   <span className="sr-only">Like</span>
                 </Button>
-                <Button size="sm" onClick={() => handleAddItemToCart(product)}>
-                  Add to Cart
-                </Button>
               </div>
+
+              {/* In Stock Span */}
+              <span
+                className={`inline-block px-2 py-1 rounded-md text-sm font-medium order-1 lg:order-2 ${
+                  product.inStock
+                    ? "bg-green-500 text-white"
+                    : "bg-red-500 text-white"
+                } mt-2 lg:mt-0 w-auto lg:text-right`}
+              >
+                {product.inStock ? "In Stock" : "Out of Stock"}
+              </span>
             </div>
           </CardContent>
         </Card>
