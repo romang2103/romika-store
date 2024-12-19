@@ -148,7 +148,7 @@ export default function ProductList() {
               {/* Buttons Container */}
               <div className="flex items-center space-x-2 order-2 lg:order-1">
                 <Button size="sm" onClick={() => handleAddItemToCart(product)}>
-                  Add to Cart
+                  В корзину
                 </Button>
                 <Button
                   variant="outline"
@@ -169,7 +169,7 @@ export default function ProductList() {
                     : "bg-red-500 text-white"
                 } mt-2 lg:mt-0 w-auto lg:text-right`}
               >
-                {product.inStock ? "In Stock" : "Out of Stock"}
+                {product.inStock ? "В наличии" : "Нет в наличии"}
               </span>
             </div>
           </CardContent>
