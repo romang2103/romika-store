@@ -48,6 +48,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   //   get().setSearchedProducts(searchedProducts);
   // },
   filterProducts: async (filters) => {
+    set({ loading: true });
     const allProducts = get().products;
     const searchTerm = get().searchTerm.toLowerCase();
     let filteredProductList = allProducts;
@@ -69,7 +70,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   
     // Set filtered products to the computed list (could be filtered by categories, search term, both, or neither)
     get().setFilteredProducts(filteredProductList);
-  
+    set({ loading: false });
+
     console.log("filters and products: ", filters, allProducts.length);
   },
 }));

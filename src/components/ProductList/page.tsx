@@ -18,7 +18,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getAllProducts } from "@/use-cases/productUseCases";
 
 export default function ProductList() {
   const {
@@ -45,39 +44,31 @@ export default function ProductList() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        setLoading(true);
         console.log("Trying to load products");
-        const data = await getAllProducts();
-        setProducts(data);
-        setFilteredProducts(data);
-        setTotalProducts(data.length);
-        setTotalPages(Math.ceil(data.length / productsPerPage));
+        setFilteredProducts(products);
+        setTotalProducts(products.length);
+        setTotalPages(Math.ceil(products.length / productsPerPage));
       } catch (error) {
         console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
       }
     }
 
     loadProducts();
-  }, [setLoading, setProducts, setFilteredProducts, productsPerPage]);
+  }, [productsPerPage]);
 
   useEffect(() => {
     async function loadFilteredProducts() {
       try {
-        setLoading(true);
         console.log("Trying to load filtered products");
         await filterProducts(Filters);
         handlePageChange(1);
       } catch (error) {
         console.error("Error fetching filtered products:", error);
-      } finally {
-        setLoading(false);
       }
     }
 
     loadFilteredProducts();
-  }, [Filters, searchTerm, filterProducts, setLoading]);
+  }, [Filters, searchTerm]);
 
   useEffect(() => {
     setTotalProducts(filteredProducts.length);
@@ -104,11 +95,12 @@ export default function ProductList() {
   };
 
   const handleOpenProductPage = async (product: ProductData) => {
-    router.push(`/pages/product-page?id=${product.product_id}`);
+    // router.push(`/pages/product-page?id=${product.product_id}`);
+    router.push(`/?id=${product.product_id}`);
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading... 2</div>;
   }
 
   return (
@@ -131,7 +123,7 @@ export default function ProductList() {
 
             {/* Product Name */}
             <h3
-              className="text-lg font-semibold cursor-pointer border sm:h-20 md:h-14 lg:h-22 line-clamp-2 hover:underline"
+              className="text-lg font-semibold cursor-pointer sm:h-20 md:h-14 lg:h-22 line-clamp-2 hover:underline"
               onClick={() => handleOpenProductPage(product)}
             >
               {product.name}
