@@ -1,22 +1,7 @@
 'use server';
 
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
-
-interface ProductData {
-    _id: ObjectId;
-    product_id: number;
-    description: string;
-    price: number;
-    name: string;
-    quantity: number;
-    minimum_order_quantity: number | null;
-    wholesale_price: number | null;
-    categories: string[];
-    search_tags: string[];
-    characteristics: any[]; // Update this type to match the actual type of characteristics
-    image_urls: string[];
-}
+import { ProductData } from "@/interfaces/interfaces";
 
 export async function fetchProducts(): Promise<ProductData[]> {
     try {
@@ -35,7 +20,10 @@ export async function getProductById(productId: number): Promise<ProductData> {
         const client = await clientPromise;
         const db = client.db('romika-db');
         const collection = db.collection('products');
-        const product = await collection.findOne({ product_id: productId }) as ProductData;
+        const product = await collection.findOne({ product_id: productId }) as unknown as ProductData;
+        if (!product) {
+            throw new Error('Product not found');
+        }
         return product;
     } catch (error) {
         throw new Error('Error getting product from database');

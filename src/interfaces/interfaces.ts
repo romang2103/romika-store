@@ -16,7 +16,7 @@ export interface CartData {
 }
 
 export interface ProductData {
-    _id: String;
+    _id: string;
     product_id: number;
     description: string;
     price: number;
@@ -32,12 +32,12 @@ export interface ProductData {
 }
 
 export interface SessionData {
-    _id?: ObjectId;
+    _id?: string;
     sessionId: string;
 }
 
 export interface FilterOptionData {
-    _id: ObjectId;
+    _id: ObjectId | string;
     id: number;
     name: string;
 }

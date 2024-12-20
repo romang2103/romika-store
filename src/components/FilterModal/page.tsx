@@ -5,7 +5,6 @@ import { useFilterStore } from "@/store/useFilterStore";
 import { getFilterOptionsUseCase } from "@/use-cases/filterUseCases";
 import { useEffect, useState } from "react";
 import { FilterOptionData } from "@/interfaces/interfaces";
-import { ObjectId } from "mongodb";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -18,8 +17,12 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const categories = await getFilterOptionsUseCase();
-      setFilterOptions(categories);
+      try {
+        const categories = await getFilterOptionsUseCase();
+        setFilterOptions(categories);
+      } catch (error) {
+        console.error("Error fetching filter options: ", error);
+      }
     };
   
     fetchData();
@@ -42,7 +45,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen }) => {
           <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
           <div className="space-y-3">
             {filterOptions.map((category) => (
-              <div key={category.name} className="flex items-center space-x-2">
+              <div key={category.id} className="flex items-center space-x-2">
                 <Checkbox id={category.name} checked={Filters.includes(category.id)} onCheckedChange={() => handleCheckboxChange(category.id)} />
                 <Label htmlFor={category.name}>{category.name}</Label>
               </div>
