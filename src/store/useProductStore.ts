@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { ProductData } from "@/interfaces/interfaces";
 import { getAllProducts } from "@/use-cases/productUseCases";
-import ProductList from "@/components/ProductList/page";
 
 interface ProductStore {
   products: ProductData[];
