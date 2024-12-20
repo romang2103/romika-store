@@ -1,9 +1,11 @@
 import { useCartStore } from "@/store/useCartStore";
 import { useFilterStore } from "@/store/useFilterStore";
+import { useRouter } from "next/navigation";
 import { JSX, SVGProps } from "react";
 
 
 export default function Header() {
+  const router = useRouter();
   const { openFilterModal } = useFilterStore();
   const { openCartModal } = useCartStore();
 
@@ -13,7 +15,7 @@ export default function Header() {
         <button onClick={openFilterModal}>
           <MenuIcon className="w-6 h-6" />
         </button>
-        <span className="text-xl font-bold text-secondary">Romika</span>
+        <span className="text-xl font-bold text-secondary" onClick={() => {router.push('/')}}>Romika</span>
       </div>
       <div className="flex items-center space-x-4">
         <UserIcon className="w-6 h-6" />

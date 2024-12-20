@@ -117,6 +117,7 @@ export default function ProductList() {
                 src={product.image_urls[0]}
                 alt={product.name}
                 className="max-h-full max-w-full object-contain"
+                loading="lazy"
                 onClick={() => handleOpenProductPage(product)}
               />
             </div>
@@ -130,7 +131,7 @@ export default function ProductList() {
             </h3>
 
             {/* Product Price */}
-            <p className="mt-2 text-xl font-bold">{product.price} rub</p>
+            <p className="mt-2 text-xl font-bold">{product.price} руб</p>
 
             {/* Spacer to push the final row to the bottom */}
             <div className="mt-4 flex-grow"></div>
