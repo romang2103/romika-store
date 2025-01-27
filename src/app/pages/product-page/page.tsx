@@ -127,17 +127,14 @@ export default function ProductPage() {
 
           {/* About This Item */}
           <section aria-label="Product features">
-            <h2 className="text-xl font-semibold mb-4">About this item:</h2>
+            <h2 className="text-xl font-semibold mb-4">Описание товара:</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-2">
-              <li>Active Noise Cancellation for immersive sound</li>
-              <li>40-hour battery life for all-day listening</li>
-              <li>Bluetooth 5.0 for seamless connectivity</li>
-              <li>Comfortable memory foam ear cushions</li>
-              <li>Voice assistant compatible</li>
+              {product?.description.map((desc: string) => (
+                <li key={desc}>{desc}</li>
+              ))}
             </ul>
             <div>
-              {product?.description}
-            </div>
+          </div>
 
           </section>
         </div>
