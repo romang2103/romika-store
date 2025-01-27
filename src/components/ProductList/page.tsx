@@ -108,7 +108,7 @@ export default function ProductList() {
       {productsOnPage.map((product) => (
         <Card
           key={product.product_id}
-          className="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+          className="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col border-none"
         >
           <CardContent className="flex flex-col flex-1 p-4">
             {/* Image Container */}
@@ -137,7 +137,7 @@ export default function ProductList() {
             <div className="mt-4 flex-grow"></div>
 
             {/* Final Row with Responsive Layout */}
-            <div className="flex flex-row justify-between lg:flex-col items-center lg:items-end justify-end gap-2 mt-4 w-full">
+            <div className="flex flex-row justify-between lg:flex-col items-center lg:items-end gap-2 mt-4 w-full">
               {/* Buttons Container */}
               <div className="flex items-center space-x-2 order-2 lg:order-1">
                 <Button size="sm" onClick={() => handleAddItemToCart(product)}>

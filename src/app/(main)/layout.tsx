@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const shouldShowSearchBar = !searchParams.has("id");
 
   return (
-    <div className="min-h-screen bg-gray-100 border">
+    <div className="min-h-screen bg-gray-100">
         {shouldShowHeader && <Header />}
         <main className="p-4 md:px-8">
             {shouldShowSearchBar && <SearchBar />}

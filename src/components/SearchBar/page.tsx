@@ -14,13 +14,13 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="relative mb-4 border">
+    <div className="relative mb-4 ">
       <div className="relative">
         <SearchIcon className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
         <Input
           type="search"
           placeholder="Search products..."
-          className="w-full pl-10 pr-4 py-2 border rounded-md"
+          className="w-full pl-10 pr-4 py-2 border-none rounded-md"
           onChange={handleSearch}
         />
       </div>
