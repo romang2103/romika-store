@@ -12,21 +12,7 @@ interface FilterModalProps {
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen }) => {
-  const { closeFilterModal, removeFilter, addFilter, Filters } = useFilterStore();
-  const [filterOptions, setFilterOptions] = useState<FilterOptionData[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const categories = await getFilterOptionsUseCase();
-        setFilterOptions(categories);
-      } catch (error) {
-        console.error("Error fetching filter options: ", error);
-      }
-    };
-  
-    fetchData();
-  }, []);
+  const { closeFilterModal, removeFilter, addFilter, Filters, filterOptions } = useFilterStore();
 
   const handleCheckboxChange = (categoryId: number) => {
     if (Filters.includes(categoryId)) {
