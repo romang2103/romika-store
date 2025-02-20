@@ -6,7 +6,7 @@ export interface CartItemData {
     quantity: number;
     image: string;
     name: string;
-    description: string;
+    description: string[];
 }
 
 export interface CartData {
@@ -40,4 +40,32 @@ export interface FilterOptionData {
     _id: ObjectId | string;
     id: number;
     name: string;
+}
+
+export interface ContactInfo {
+    phoneNumber: string;
+    email: string;
+}
+
+export interface Address {
+    street: string;
+    city: string;
+    region: string;
+    postcode: string;
+}
+
+export interface OrderData {
+    name: string;
+    deliveryMethod: 'pickup' | 'courier';
+    shippingCost: number;
+    total: number;
+    cartItems: CartItemData[];
+    contactInfo: ContactInfo;
+    comments?: string;
+    address?: Address | null;
+}
+
+export interface OrderDetails extends OrderData {
+    _id?: ObjectId | string;
+    createdAt?: Date;
 }

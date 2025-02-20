@@ -3,19 +3,11 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateItemInCartQuantityUseCase } from "@/use-cases/cartUseCases";
 import { useCartStore } from "@/store/useCartStore";
+import { CartItemData } from "@/interfaces/interfaces";
 
 interface CartItemProps {
   cartItem: CartItemData;
   onQuantityChange: (productId: number, quantity: number) => void;
-}
-
-interface CartItemData {
-  productId: number;
-  price: number;
-  quantity: number;
-  image: string;
-  name: string;
-  description: string;
 }
 
 const CartItem: React.FC<CartItemProps> = ({ cartItem, onQuantityChange }) => {
