@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LoadingSpinner } from "../ui/spinner";
 import { HeartIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
@@ -100,7 +101,7 @@ export default function ProductList() {
   };
 
   if (loading) {
-    return <div>Loading... 2</div>;
+    return <LoadingSpinner />;
   }
 
   return (

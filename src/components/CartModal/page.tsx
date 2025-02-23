@@ -82,11 +82,11 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen }) => {
               </ScrollArea>
               <div className="border-t px-6 py-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Total</span>
+                  <span className="text-muted-foreground">Итого:</span>
                   <span className="font-medium">{CartTotal.toFixed(2)} руб</span>
                 </div>
                 <Button className="w-full mt-4" onClick={handleCheckout}>
-                  Proceed to Checkout
+                  Оформлению заказа
                 </Button>
               </div>
             </>

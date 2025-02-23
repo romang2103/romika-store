@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { LoadingSpinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
@@ -39,7 +40,7 @@ export default function OrderConfirmationPage() {
     fetchOrderDetails()
   }, [searchParams])
 
-  if (loading) return <div className="container mx-auto max-w-3xl px-4 py-12">Loading...</div>
+  if (loading) return <div className="container mx-auto max-w-3xl px-4 py-12"><LoadingSpinner/></div>
   if (error) return <div className="container mx-auto max-w-3xl px-4 py-12">Error: {error}</div>
   if (!orderDetails) return <div className="container mx-auto max-w-3xl px-4 py-12">No order details found</div>
 

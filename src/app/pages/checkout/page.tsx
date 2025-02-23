@@ -48,7 +48,7 @@ const CheckoutPage = () => {
   useEffect(() => {
     const fetchCartData = async () => {
       setLoading(true);
-      await loadCart();
+      loadCart();
       setLoading(false);
     };
 
@@ -163,199 +163,184 @@ const CheckoutPage = () => {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
+      <h1 className="mb-8 text-3xl font-bold">Оформлению заказа</h1>
       {loading ? (
-        <p>Loading...</p>
+        <LoadingSpinner/>
       ) : (
         <>
-          {CartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-6 py-12">
-              <ShoppingBag size={72} strokeWidth={1} />
-              <h2 className="text-2xl font-bold text-center">Your cart is empty</h2>
-              <p className="text-muted-foreground text-center">
-                Looks like you haven't added any items to your cart yet.
-              </p>
-              <div className="flex gap-2">
-                <Button onClick={() => { router.push('/') }}>Go to Shop</Button>
-              </div>
+            <div className="grid gap-6">
+              {CartItems.map((cartItem: CartItemData) => (
+                <CartItem
+                  key={cartItem.productId}
+                  cartItem={cartItem}
+                  onQuantityChange={handleQuantityChange}
+                />
+              ))}
             </div>
-          ) : (
-            <>
-              <div className="grid gap-6">
-                {CartItems.map((cartItem: CartItemData) => (
-                  <CartItem
-                    key={cartItem.productId}
-                    cartItem={cartItem}
-                    onQuantityChange={handleQuantityChange}
-                  />
-                ))}
+            <Separator className="my-8" />
+            <div className="grid gap-4">
+              {/* Delivery Method */}
+              <div className="grid gap-2">
+                <Label htmlFor="delivery-method">Метод доставки</Label>
+                <RadioGroup
+                  id="delivery-method"
+                  value={deliveryMethod}
+                  onValueChange={handleDeliveryMethodChange}
+                >
+                  <div className="flex items-center gap-4">
+                    <Label
+                      htmlFor="pickup"
+                      className="flex items-center gap-2 font-medium"
+                    >
+                      <RadioGroupItem id="pickup" value="pickup" />
+                      Самовывоз (бесплатно)
+                    </Label>
+                    <div className="text-sm text-muted-foreground">
+                      Удобный, бесплатный и быстрый способ получения заказа
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label
+                      htmlFor="courier"
+                      className="flex items-center gap-2 font-medium"
+                    >
+                      <RadioGroupItem id="courier" value="courier" />
+                      Автокурьер (5.00 руб)
+                    </Label>
+                    <div className="text-sm text-muted-foreground">
+                      Удобный, платный и быстрый способ получения заказа
+                    </div>
+                  </div>
+                </RadioGroup>
               </div>
-              <Separator className="my-8" />
-              <div className="grid gap-4">
-                {/* Delivery Method */}
-                <div className="grid gap-2">
-                  <Label htmlFor="delivery-method">Delivery Method</Label>
-                  <RadioGroup
-                    id="delivery-method"
-                    value={deliveryMethod}
-                    onValueChange={handleDeliveryMethodChange}
-                  >
-                    <div className="flex items-center gap-4">
-                      <Label
-                        htmlFor="pickup"
-                        className="flex items-center gap-2 font-medium"
-                      >
-                        <RadioGroupItem id="pickup" value="pickup" />
-                        Самовывоз (бесплатно)
-                      </Label>
-                      <div className="text-sm text-muted-foreground">
-                        Удобный, бесплатный и быстрый способ получения заказа
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Label
-                        htmlFor="courier"
-                        className="flex items-center gap-2 font-medium"
-                      >
-                        <RadioGroupItem id="courier" value="courier" />
-                        Автокурьер (5.00 руб)
-                      </Label>
-                      <div className="text-sm text-muted-foreground">
-                        Удобный, платный и быстрый способ получения заказа
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </div>
 
-                {/* Name Field */}
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
+              {/* Name Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="name">Имя</Label>
+                <Input
+                  id="name"
+                  placeholder="Ваше имя"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-                {/* Contact Information */}
-                <div className="grid gap-2">
-                  <Label htmlFor="phone-number">Phone Number</Label>
-                  <Input
-                    id="phone-number"
-                    placeholder="Your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+              {/* Contact Information */}
+              <div className="grid gap-2">
+                <Label htmlFor="phone-number">Телефон:</Label>
+                <Input
+                  id="phone-number"
+                  placeholder="+375 (__) ___-__-__"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Электронная почта</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-                {/* Address Fields */}
-                {deliveryMethod === "courier" && (
+              {/* Address Fields */}
+              {deliveryMethod === "courier" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Адрес</Label>
                   <div className="grid gap-2">
-                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="street"
+                      placeholder="Адрес улицы"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                    />
                     <div className="grid gap-2">
                       <Input
-                        id="street"
-                        placeholder="Street Address"
-                        value={street}
-                        onChange={(e) => setStreet(e.target.value)}
+                        id="city"
+                        placeholder="Город"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
                       />
-                      <div className="grid gap-2">
-                        <Input
-                          id="city"
-                          placeholder="City"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Input
-                          id="region"
-                          placeholder="Region"
-                          value={region}
-                          onChange={(e) => setRegion(e.target.value)}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Input
-                          id="postcode"
-                          placeholder="Postal Code"
-                          value={postcode}
-                          onChange={(e) => setPostcode(e.target.value)}
-                        />
-                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Input
+                        id="region"
+                        placeholder="Область"
+                        value={region}
+                        onChange={(e) => setRegion(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Input
+                        id="postcod"
+                        placeholder="Почтовый индекс"
+                        value={postcode}
+                        onChange={(e) => setPostcode(e.target.value)}
+                      />
                     </div>
                   </div>
-                )}
-
-                {/* Comment Sections */}
-                {deliveryMethod === "pickup" && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="pickup-comment">Comment (Pickup)</Label>
-                    <Textarea
-                      id="pickup-comment"
-                      placeholder="Add any comments for your pickup..."
-                      value={pickupComment}
-                      onChange={(e) => setPickupComment(e.target.value)}
-                      rows={4}
-                    />
-                  </div>
-                )}
-                {deliveryMethod === "courier" && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="courier-comment">Comment (Courier)</Label>
-                    <Textarea
-                      id="courier-comment"
-                      placeholder="Add any comments for your courier delivery..."
-                      value={courierComment}
-                      onChange={(e) => setCourierComment(e.target.value)}
-                      rows={4}
-                    />
-                  </div>
-                )}
-
-                {/* Order Summary */}
-                <div className="flex items-center justify-between">
-                  <p className="text-muted-foreground">Subtotal</p>
-                  <p className="font-medium">{formattedCartTotal} руб</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-muted-foreground">Shipping</p>
-                  <p className="font-medium">{shippingCost.toFixed(2)} руб</p>
-                </div>
-                <Separator className="my-4" />
-                <div className="flex items-center justify-between">
-                  <p className="text-lg font-medium">Total</p>
-                  <p className="text-lg font-medium">{total.toFixed(2)} руб</p>
-                </div>
-              </div>
-
-              {/* Error Message */}
-              {error && (
-                <div className="mt-4 p-4 text-red-700 bg-red-100 rounded">
-                  {error}
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => { router.push('/') }}>Continue Shopping</Button>
-                <Button onClick={handlePlaceOrder} disabled={submitting}>
-                  {submitting ? <LoadingSpinner/> : "Place Order" }
-                </Button>
+              {/* Comment Sections */}
+              {deliveryMethod === "pickup" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="pickup-comment">Комментарий (самовывоз)</Label>
+                  <Textarea
+                    id="pickup-comment"
+                    placeholder="Add any comments for your pickup..."
+                    value={pickupComment}
+                    onChange={(e) => setPickupComment(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              )}
+              {deliveryMethod === "courier" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="courier-comment">Комментарий (курьер)</Label>
+                  <Textarea
+                    id="courier-comment"
+                    placeholder="Add any comments for your courier delivery..."
+                    value={courierComment}
+                    onChange={(e) => setCourierComment(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              )}
+
+              {/* Order Summary */}
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">Промежуточную сумму</p>
+                <p className="font-medium">{formattedCartTotal} руб</p>
               </div>
-            </>
-          )}
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">Доставка</p>
+                <p className="font-medium">{shippingCost.toFixed(2)} руб</p>
+              </div>
+              <Separator className="my-4" />
+              <div className="flex items-center justify-between">
+                <p className="text-lg font-medium">К оплате</p>
+                <p className="text-lg font-medium">{total.toFixed(2)} руб</p>
+              </div>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mt-4 p-4 text-red-700 bg-red-100 rounded">
+                {error}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="mt-8 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { router.push('/') }}>Продолжить покупки</Button>
+              <Button onClick={handlePlaceOrder} disabled={submitting}>
+                {submitting ? <LoadingSpinner/> : "Подтвердить заказ" }
+              </Button>
+            </div>
         </>
       )}
     </div>
