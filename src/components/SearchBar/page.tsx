@@ -19,7 +19,7 @@ export default function SearchBar() {
         <SearchIcon className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
         <Input
           type="search"
-          placeholder="Search products..."
+          placeholder="Поиск продуктов..."
           className="w-full pl-10 pr-4 py-2 border-none rounded-md"
           onChange={handleSearch}
         />

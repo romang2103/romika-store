@@ -46,7 +46,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen }) => {
       <SheetContent side="right" className="sm:max-w-sm">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-6 py-4 border-b">
-            <h3 className="text-lg font-medium">My Cart</h3>
+            <h3 className="text-lg font-medium">Моя корзина</h3>
             <SheetClose asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <XIcon className="h-5 w-5" />
@@ -58,13 +58,13 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen }) => {
             <div className="border-t px-6 py-16">
               <div className="flex flex-col items-center justify-center gap-6">
                 <ShoppingBag size={36} />
-                <h2 className="text-lg font-bold">Your cart is empty</h2>
+                <h2 className="text-lg font-bold">В корзине нет товаров</h2>
                 <h4 className="text-sm text-muted-foreground font-medium text-center">
-                  Looks like you haven't added any items to your cart yet.
+                  Похоже, вы еще не добавили товары в свою корзину
                 </h4>
                 <div className="flex gap-2">
                   <SheetClose asChild>
-                    <Button>Continue Shopping</Button>
+                    <Button>Продолжить покупки</Button>
                   </SheetClose>
                 </div>
               </div>
