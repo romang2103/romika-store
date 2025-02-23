@@ -47,27 +47,27 @@ export default function OrderConfirmationPage() {
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <div className="text-center mb-8">
         <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-        <h1 className="mt-4 text-3xl font-bold">Order Complete</h1>
-        <p className="mt-2 text-muted-foreground">Thank you for your purchase!</p>
+        <h1 className="mt-4 text-3xl font-bold">Заказ выполнен</h1>
+        <p className="mt-2 text-muted-foreground">Спасибо за покупку!</p>
       </div>
 
       <div className="bg-muted p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+        <h2 className="text-xl font-semibold mb-4">Детали заказа</h2>
         <div className="grid gap-2">
           <div className="flex justify-between">
-            <span>Order ID:</span>
+            <span>Номер заказа:</span>
             <span className="font-medium">{orderDetails._id?.toString()}</span>
           </div>
           <div className="flex justify-between">
-            <span>Name:</span>
+            <span>Имя:</span>
             <span className="font-medium">{orderDetails.name}</span>
           </div>
           <div className="flex justify-between">
-            <span>Delivery Method:</span>
-            <span className="font-medium">{orderDetails.deliveryMethod === "pickup" ? "Pickup" : "Courier"}</span>
+            <span>Метод доставки:</span>
+            <span className="font-medium">{orderDetails.deliveryMethod === "pickup" ? "Самовывоз" : "Курьер"}</span>
           </div>
           <div className="flex justify-between">
-            <span>Total:</span>
+            <span>Итого:</span>
             <span className="font-medium">{orderDetails.total.toFixed(2)} руб</span>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function OrderConfirmationPage() {
       <Separator className="my-8" />
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+        <h2 className="text-xl font-semibold mb-4">Cводка заказа</h2>
         {orderDetails.cartItems.map((item) => (
           <div key={item.productId} className="flex items-center py-4 space-x-4">
             <div className="flex-shrink-0">
@@ -102,12 +102,12 @@ export default function OrderConfirmationPage() {
       <Separator className="my-8" />
 
       <div className="flex justify-between items-center">
-        <span className="text-lg font-semibold">Total</span>
+        <span className="text-lg font-semibold">Итого:</span>
         <span className="text-lg font-semibold">{orderDetails.total.toFixed(2)} руб</span>
       </div>
 
       <div className="mt-8 flex justify-center">
-        <Button onClick={() => router.push("/")}>Continue Shopping</Button>
+        <Button onClick={() => router.push("/")}>Продолжить покупки</Button>
       </div>
     </div>
   )
