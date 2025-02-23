@@ -25,7 +25,35 @@ export default function MainPage() {
   }, [fetchProducts]);
 
   if (loading) {
-    return <div>Loading products...</div>;
+    return (
+      <div className="spinner-container">
+        <div className="spinner"></div>
+        <style jsx>{`
+          .spinner-container {
+            border: 1px solid black #f3f3f3;
+            display: flex;
+            justify-content: center;
+            // align-items: center;
+            height: calc(100vh - 60px);
+            width: 100vw;
+            margin-top: 60px; 
+          }
+          .spinner {
+            border: 12px solid #f3f3f3;
+            border-top: 12px solid #3498db;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+        </style>
+      </div>
+    );
   }
 
   return (
@@ -34,4 +62,3 @@ export default function MainPage() {
     </div>
   );
 }
-
