@@ -1,5 +1,6 @@
 import { createOrder, getOrderById } from "@/data-access/orderRepository";
 import { OrderData, OrderDetails } from "@/interfaces/interfaces";
+import { sendEmail } from "@/lib/sendEmail";
 
 /**
  * Place a new order.
@@ -14,9 +15,12 @@ export async function placeOrderUseCase(orderData: OrderData): Promise<OrderDeta
     // - Calculating taxes
 
     // For simplicity, we'll directly create the order
+    console.log("🛒 Placing order...");
     const newOrder = await createOrder(orderData);
-
+    console.log("✅ Order placed successfully!");
     // Post-processing logic can be added here, such as sending confirmation emails
+    console.log("📧 Sending email...1");
+    const email = await sendEmail(newOrder);
 
     return newOrder;
 }

@@ -40,9 +40,15 @@ export async function getOrderById(orderId: string): Promise<OrderDetails | null
 
     const order = await collection.findOne({ _id: new ObjectId(orderId) });
 
+    if (!order) {
+        throw new Error(`Order with ID ${orderId} not found`);
+    }
     console.log('Order fetched:', order);
 
-    return order;
+    return {
+        ...order,
+        _id: order._id.toString(),
+    };
 }
 
 /**
