@@ -20,6 +20,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const shouldShowHeader = !NO_HEADER_ROUTES.includes(pathname);
   const shouldShowSearchBar = !searchParams.has("id");
 
+  // return (
+  //   <div className="min-h-screen bg-gray-100">
+  //       {shouldShowHeader && <Header />}
+  //       <main className="p-4 md:px-8">
+  //           {shouldShowSearchBar && <SearchBar />}
+  //           {children}
+  //       </main>
+
+  //     {/* Modals */}
+  //     <FilterModal isOpen={isFilterModalOpen} onOpenChange={openFilterModal} />
+  //     <CartModal isOpen={isCartModalOpen} onOpenChange={openCartModal} />
+  //   </div>
+  // );
+
   return (
     <div className="min-h-screen bg-gray-100">
         {shouldShowHeader && <Header />}

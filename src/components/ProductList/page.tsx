@@ -105,78 +105,84 @@ export default function ProductList() {
   }
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-      {productsOnPage.map((product) => (
-        <Card
-          key={product.product_id}
-          className="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col border-none"
-        >
-          <CardContent className="flex flex-col flex-1 p-4">
-            {/* Image Container */}
-            <div className="w-full h-48 flex items-center justify-center bg-gray-100 mb-4 rounded-md cursor-pointer">
-              <img
-                src={product.image_urls[0]}
-                alt={product.name}
-                className="max-h-full max-w-full object-contain"
-                loading="lazy"
+    <div className="container mx-auto px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {productsOnPage.map((product) => (
+          <Card
+            key={product.product_id}
+            className="group hover:shadow-xl transition-shadow duration-300 border border-gray-200"
+          >
+            <CardContent className="p-0">
+              {/* Image Container with Hover Effect */}
+              <div 
+                className="relative aspect-square overflow-hidden bg-gray-50 cursor-pointer"
                 onClick={() => handleOpenProductPage(product)}
-              />
-            </div>
-
-            {/* Product Name */}
-            <h3
-              className="text-lg font-semibold cursor-pointer sm:h-20 md:h-14 lg:h-22 line-clamp-2 hover:underline"
-              onClick={() => handleOpenProductPage(product)}
-            >
-              {product.name}
-            </h3>
-
-            {/* Product Price */}
-            <p className="mt-2 text-xl font-bold">{product.price} руб</p>
-
-            {/* Spacer to push the final row to the bottom */}
-            <div className="mt-4 flex-grow"></div>
-
-            {/* Final Row with Responsive Layout */}
-            <div className="flex flex-row justify-between lg:flex-col items-center lg:items-end gap-2 mt-4 w-full">
-              {/* Buttons Container */}
-              <div className="flex items-center space-x-2 order-2 lg:order-1">
-                <Button size="sm" onClick={() => handleAddItemToCart(product)}>
-                  В корзину
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="text-gray-500 hover:text-red-500"
-                  onClick={() => { /* Implement like functionality here */ }}
-                >
-                  <HeartIcon className="w-5 h-5" />
-                  <span className="sr-only">Like</span>
-                </Button>
+              >
+                <img
+                  src={product.image_urls[0]}
+                  alt={product.name}
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                {!product.inStock && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="text-white font-semibold px-4 py-2 bg-primary rounded-md">
+                      Нет в наличии
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* In Stock Span */}
-              <span
-                className={`inline-block px-2 py-1 rounded-md text-sm font-medium order-1 lg:order-2 ${
-                  product.inStock
-                    ? "bg-green-500 text-white"
-                    : "bg-red-500 text-white"
-                } mt-2 lg:mt-0 w-auto lg:text-right`}
-              >
-                {product.inStock ? "В наличии" : "Нет в наличии"}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-      <div className="col-span-full flex justify-center">
+              <div className="p-4 space-y-3">
+                {/* Product Name */}
+                <h3 
+                  className="font-medium line-clamp-2 min-h-[2.5rem] cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => handleOpenProductPage(product)}
+                >
+                  {product.name}
+                </h3>
+
+                {/* Price */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold text-primary-800">
+                    {product.price} руб
+                  </span>
+                  {product.inStock && (
+                    <span className="text-sm text-primary-600 font-medium">
+                      В наличии
+                    </span>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <Button 
+                    className="flex-1 bg-primary hover:bg-primary-700"
+                    onClick={() => handleAddItemToCart(product)}
+                    disabled={!product.inStock}
+                  >
+                    В корзину
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 border-primary text-primary hover:bg-primary hover:text-white"
+                  >
+                    <HeartIcon className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-8 mb-12">
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={() => handlePageChange(Math.max(page - 1, 1))}
-              />
+              <PaginationPrevious className="hover:bg-primary-50" />
             </PaginationItem>
             {totalPages > 5 && page - 1 > 3 && (
               <>
@@ -224,10 +230,7 @@ export default function ProductList() {
               </>
             )}
             <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
-              />
+              <PaginationNext className="hover:bg-primary-50" />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

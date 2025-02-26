@@ -10,19 +10,21 @@ export default function SearchBar() {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-    filterProducts(Filters); // Call your filtering logic here
+    filterProducts(Filters);
   };
 
   return (
-    <div className="relative mb-4 ">
-      <div className="relative">
-        <SearchIcon className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
-        <Input
-          type="search"
-          placeholder="Поиск продуктов..."
-          className="w-full pl-10 pr-4 py-2 border-none rounded-md"
-          onChange={handleSearch}
-        />
+    <div className="container mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            type="search"
+            placeholder="Поиск продуктов..."
+            className="w-full pl-10 pr-4 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+            onChange={handleSearch}
+          />
+        </div>
       </div>
     </div>
   );

@@ -7,21 +7,44 @@ import { JSX, SVGProps } from "react";
 export default function Header() {
   const router = useRouter();
   const { openFilterModal } = useFilterStore();
-  const { openCartModal } = useCartStore();
+  const { openCartModal, CartItems } = useCartStore();
 
   return (
-    <header className="flex items-center justify-between p-4 bg-primary shadow-md md:px-8">
-      <div className="flex items-center space-x-4">
-        <button onClick={openFilterModal}>
-          <MenuIcon className="w-6 h-6" />
-        </button>
-        <span className="text-xl font-bold text-secondary" onClick={() => {router.push('/')}}>Romika</span>
-      </div>
-      <div className="flex items-center space-x-4">
-        <UserIcon className="w-6 h-6" />
-        <button onClick={openCartModal}>
-          <ShoppingCartIcon className="w-6 h-6" />
-        </button>
+    <header className="sticky top-0 z-50 bg-primary text-white shadow-md">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={openFilterModal}
+              className="p-2 hover:bg-primary-700 rounded-full transition-colors"
+            >
+              <MenuIcon className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => router.push('/')}
+              className="text-xl font-bold hover:opacity-80 transition-opacity"
+            >
+              Romika
+            </button>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <button className="p-2 hover:bg-primary-700 rounded-full transition-colors">
+              <UserIcon className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={openCartModal}
+              className="p-2 hover:bg-primary-700 rounded-full transition-colors relative"
+            >
+              <ShoppingCartIcon className="w-6 h-6" />
+              {CartItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {CartItems.length}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );
