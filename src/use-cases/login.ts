@@ -11,18 +11,18 @@ interface User extends UserLoginData {
     role: string;
 }
 
-export async function loginUseCase(userLoginData: UserLoginData): Promise<{ message: string, status: number, role?: string } | undefined> {
+export async function loginUseCase(userLoginData: UserLoginData): Promise<{ message: string, status: number, role?: string }> {
     try {
         const user = await findUserByEmail(userLoginData.email);
 
         if (!user) {
-            return { message: 'Authentication failed', status: 401 }; // More generic message
+            return { message: 'Invalid credentials', status: 401 };
         }
 
         const passwordMatch = await compare(userLoginData.password, user.password);
 
         if (!passwordMatch) {
-            return { message: 'Authentication failed', status: 401 }; // Same message for security
+            return { message: 'Invalid credentials', status: 401 };
         }
 
         switch (user.role) {
@@ -34,8 +34,7 @@ export async function loginUseCase(userLoginData: UserLoginData): Promise<{ mess
                 return { message: 'Invalid role', status: 400 };
         }
     } catch (error) {
-        // More specific error handling could be implemented here
         console.error('Error during login process:', error);
-        return { message: 'An error occurred during the login process', status: 500 };
+        return { message: 'An error occurred during login', status: 500 };
     }
 }

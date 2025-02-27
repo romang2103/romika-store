@@ -90,25 +90,25 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async () => {
     // Basic validation
     if (!name.trim()) {
-      setError("Please enter your name.");
+      setError("Введите свое имя");
       return;
     }
 
     if (!phoneNumber.trim()) {
-      setError("Please enter your phone number.");
+      setError("Введите свой номер телефона");
       return;
     }
 
     // Simple email regex for validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email)) {
-      setError("Please enter a valid email address.");
+      setError("Введите действующий адрес электронной почты");
       return;
     }
 
     if (deliveryMethod === "courier") {
       if (!street || !city || !region || !postcode) {
-        setError("Please fill out all address fields for courier delivery.");
+        setError("Введите адрес доставки");
         return;
       }
     }
@@ -150,7 +150,7 @@ const CheckoutPage = () => {
 
     try {
       const order = await placeOrderUseCase(orderData);
-      router.push(`/pages/order-confirmation?orderId=${order._id}`);
+      router.push(`/order-confirmation?orderId=${order._id}`);
       clearCart();
     } catch (error) {
       setError("An error occurred while placing your order. Please try again.");

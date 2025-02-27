@@ -55,8 +55,8 @@ export default function SignUpForm() {
 
     switch (response.status) {
       case 201:
-        router.push('/pages/login');
-        break;
+        router.push('/login');
+        break;  
       case 400:
         console.log(`Validation error: ${response.message}`);
         break;

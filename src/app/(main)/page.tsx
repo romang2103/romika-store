@@ -7,7 +7,7 @@
 
 import { useSearchParams } from "next/navigation";
 import ProductList from "@/components/ProductList/page";
-import ProductPage from "../pages/product-page/page";
+import ProductPage from "../product-page/page";
 import { useProductStore } from "@/store/useProductStore";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useEffect } from "react";

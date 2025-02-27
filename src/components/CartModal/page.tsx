@@ -35,7 +35,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen }) => {
   const handleCheckout = async () => {
     const isCartValid = await isCartValidUseCase();
     if (isCartValid) {
-      router.push("/pages/checkout");
+      router.push("/checkout");
     } else {
       alert("Your cart is empty!");
     }

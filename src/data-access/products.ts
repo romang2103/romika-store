@@ -15,6 +15,30 @@ export async function fetchProducts(): Promise<ProductData[]> {
     }
 }
 
+export async function createProduct(productData: ProductData): Promise<ProductData> {
+    const client = await clientPromise;
+    const db = client.db('romika-db');
+    const collection = db.collection('products');
+    
+    await collection.insertOne(productData);
+    return productData;
+}
+
+export async function updateProduct(productId: number, productData: Partial<ProductData>): Promise<ProductData> {
+    const client = await clientPromise;
+    const db = client.db('romika-db');
+    const collection = db.collection('products');
+    await collection.updateOne({ product_id: productId }, { $set: productData });
+    return { ...productData, product_id: productId } as ProductData;
+}
+
+export async function deleteProduct(productId: number): Promise<void> {
+    const client = await clientPromise;
+    const db = client.db('romika-db');
+    const collection = db.collection('products');
+    await collection.deleteOne({ product_id: productId });
+}
+
 export async function getProductById(productId: number): Promise<ProductData> {
     try {
         const client = await clientPromise;

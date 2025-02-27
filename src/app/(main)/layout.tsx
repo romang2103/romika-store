@@ -7,8 +7,8 @@ import FilterModal from "@/components/FilterModal/page";
 import CartModal from "@/components/CartModal/page";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useCartStore } from "@/store/useCartStore";
-
-const NO_HEADER_ROUTES = ["/checkout", "/login", "/signup"];
+import { Toaster } from "@/components/ui/sonner";
+const NO_HEADER_ROUTES = ["/checkout", "/login", "/signup", "/admin"];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -43,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
       {/* Modals */}
+      <Toaster />
       <FilterModal isOpen={isFilterModalOpen} onOpenChange={openFilterModal} />
       <CartModal isOpen={isCartModalOpen} onOpenChange={openCartModal} />
     </div>

@@ -23,6 +23,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { loginAction } from "./actions";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -32,6 +33,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const { setAuth } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,16 +45,17 @@ export default function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setErrorMessage(null);
-    const formData = new FormData();
-    Object.entries(values).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
     try {
+      const formData = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      
       const response = await loginAction(formData);
 
-      if (response.status === 201) {
-        const route = response.role === 'admin' ? '/pages/admin/dashboard' : '/pages/user/dashboard';
+      if (response.status === 200) {
+        setAuth(true, response.role ?? null);
+        const route = response.role === 'admin' ? '/dashboard' : '/';
         router.push(route);
       } else {
         setErrorMessage(response.message);
@@ -103,7 +106,7 @@ export default function LoginForm() {
             </form>
           </Form>
           <div className="flex justify-center mt-4">
-            <Button variant="link" onClick={() => router.push('/pages/signup')}>
+            <Button variant="link" onClick={() => router.push('/signup')}>
               Don't have an account? Sign Up
             </Button>
           </div>

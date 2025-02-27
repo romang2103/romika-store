@@ -81,3 +81,12 @@
     background: linear-gradient(to right, #1B2440, #2d365a);
   }
 }
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
