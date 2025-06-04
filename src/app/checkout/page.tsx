@@ -336,7 +336,7 @@ const CheckoutPage = () => {
 
             {/* Action Buttons */}
             <div className="mt-8 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { router.push('/') }}>Продолжить покупки</Button>
+              <Button variant="outline" onClick={() => { router.back() }}>Продолжить покупки</Button>
               <Button onClick={handlePlaceOrder} disabled={submitting}>
                 {submitting ? <LoadingSpinner/> : "Подтвердить заказ" }
               </Button>

@@ -62,29 +62,30 @@ export default function ProductList() {
       try {
         console.log("Trying to load filtered products");
         await filterProducts(Filters);
-        handlePageChange(1);
       } catch (error) {
         console.error("Error fetching filtered products:", error);
       }
     }
-
     loadFilteredProducts();
   }, [Filters, searchTerm]);
 
   useEffect(() => {
-    setTotalProducts(filteredProducts.length);
-    setTotalPages(Math.ceil(filteredProducts.length / productsPerPage));
-  }, [filteredProducts, productsPerPage]);
-
-  useEffect(() => {
     const currentPage = Number(searchParams.get("page")) || 1;
+    const maxPage = Math.ceil(filteredProducts.length / productsPerPage) || 1;
+
+    if (currentPage > maxPage) {
+      router.push(`/?page=1`);
+      return;
+    }
+
     const start = (currentPage - 1) * productsPerPage;
     const end = start + productsPerPage;
 
-    const entries = filteredProducts.slice(start, end);
-    setProductsOnPage(entries);
+    setProductsOnPage(filteredProducts.slice(start, end));
     setPage(currentPage);
-  }, [searchParams, filteredProducts, productsPerPage]);
+    setTotalPages(maxPage);
+    setTotalProducts(filteredProducts.length);
+  }, [filteredProducts, searchParams, productsPerPage]);
 
   const handlePageChange = (newPage: number) => {
     router.push(`/?page=${newPage}`);
@@ -96,8 +97,7 @@ export default function ProductList() {
   };
 
   const handleOpenProductPage = async (product: ProductData) => {
-    // router.push(`/pages/product-page?id=${product.product_id}`);
-    router.push(`/?id=${product.product_id}`);
+    router.push(`/?id=${product.product_id}&page=${page}`);
   };
 
   if (loading) {
@@ -107,7 +107,13 @@ export default function ProductList() {
   return (
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {productsOnPage.map((product) => (
+        {productsOnPage.length === 0 ? (
+          <div className="col-span-full text-center text-muted-foreground py-12">
+            <p className="text-xl">Нет товаров по вашему запросу.</p>
+            <p className="text-sm">Попробуйте изменить фильтры или поиск.</p>
+          </div>
+        ) : (
+        productsOnPage.map((product) => (
           <Card
             key={product.product_id}
             className="group hover:shadow-xl transition-shadow duration-300 border border-gray-200"
@@ -174,67 +180,72 @@ export default function ProductList() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
 
       {/* Pagination */}
-      <div className="mt-8 mb-12">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious className="hover:bg-primary-50" />
-            </PaginationItem>
-            {totalPages > 5 && page - 1 > 3 && (
-              <>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    isActive={page === 1}
-                    onClick={() => handlePageChange(1)}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationEllipsis />
-              </>
-            )}
-            {[...Array(totalPages)]
-              .map((_, index) => index + 1)
-              .filter(
-                (pageNumber) =>
-                  pageNumber >= page - 2 && pageNumber <= page + 2,
-              )
-              .map((pageNumber) => (
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink
-                    href="#"
-                    isActive={pageNumber === page}
-                    onClick={() => handlePageChange(pageNumber)}
-                  >
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-            {totalPages > 5 && page + 2 < totalPages && (
-              <>
-                <PaginationEllipsis />
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    isActive={page === totalPages}
-                    onClick={() => handlePageChange(totalPages)}
-                  >
-                    {totalPages}
-                  </PaginationLink>
-                </PaginationItem>
-              </>
-            )}
-            <PaginationItem>
-              <PaginationNext className="hover:bg-primary-50" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      {productsOnPage.length > 0 && (
+        <div className="mt-8 mb-12">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  className="hover:bg-primary-50"
+                  onClick={() => handlePageChange(Math.max(page - 1, 1))} 
+                />
+              </PaginationItem>
+              {totalPages > 5 && page - 1 > 3 && (
+                <>
+                  <PaginationItem>
+                    <PaginationLink
+                      isActive={page === 1}
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationEllipsis />
+                </>
+              )}
+              {[...Array(totalPages)]
+                .map((_, index) => index + 1)
+                .filter(
+                  (pageNumber) =>
+                    pageNumber >= page - 2 && pageNumber <= page + 2,
+                )
+                .map((pageNumber) => (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      isActive={pageNumber === page}
+                      onClick={() => handlePageChange(pageNumber)}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+              {totalPages > 5 && page + 2 < totalPages && (
+                <>
+                  <PaginationEllipsis />
+                  <PaginationItem>
+                    <PaginationLink
+                      isActive={page === totalPages}
+                      onClick={() => handlePageChange(totalPages)}
+                    >
+                      {totalPages}
+                    </PaginationLink>
+                  </PaginationItem>
+                </>
+              )}
+              <PaginationItem>
+                <PaginationNext 
+                  className="hover:bg-primary-50"
+                  onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>  
+        </div>
+      )}
     </div>
   );
 }

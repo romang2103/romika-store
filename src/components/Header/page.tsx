@@ -21,7 +21,7 @@ export default function Header() {
               <MenuIcon className="w-6 h-6" />
             </button>
             <button 
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/?page=1')}
               className="text-xl font-bold hover:opacity-80 transition-opacity"
             >
               Romika
