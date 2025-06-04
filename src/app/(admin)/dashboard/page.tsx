@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
             </Card>
 
             <Button variant="link" onClick={() => router.push('/signup')}>
-                Don't have an account? Sign Up
+                Don&apos;t have an account? Sign Up
             </Button>
         </div>
     );

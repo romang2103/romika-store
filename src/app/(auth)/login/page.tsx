@@ -107,7 +107,7 @@ export default function LoginForm() {
           </Form>
           <div className="flex justify-center mt-4">
             <Button variant="link" onClick={() => router.push('/signup')}>
-              Don't have an account? Sign Up
+              Don&apos;t have an account? Sign Up
             </Button>
           </div>
         </CardContent>
