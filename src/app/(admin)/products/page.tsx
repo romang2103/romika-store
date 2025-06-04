@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ProductData } from "@/interfaces/interfaces";
+import { ProductData, ProductDocument } from "@/interfaces/interfaces";
 import { useProductStore } from "@/store/useProductStore";
 import { 
   createProductUseCase, 
@@ -62,7 +62,7 @@ export default function ProductsManagement() {
         }
     };
 
-    const onSubmit = async (data: ProductData) => {
+    const onSubmit = async (data: ProductDocument) => {
         try {
             if (selectedProduct) {
                 await updateProductUseCase(selectedProduct.product_id, data);

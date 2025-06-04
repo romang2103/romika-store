@@ -8,7 +8,7 @@ export async function getAllProducts(): Promise<ProductData[]> {
         const products = await fetchProducts();
         console.log("Products fetched successfully");
         return products.map(product => ({
-            _id: product._id.toString(),
+            _id: product._id?.toString(),
             product_id: product.product_id,
             description: product.description,
             price: product.price,

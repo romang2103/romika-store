@@ -15,8 +15,7 @@ export interface CartData {
     total_price: number;
 }
 
-export interface ProductData {
-    _id: string;
+export interface ProductDocument {
     product_id: number;
     description: string[];
     price: number;
@@ -29,6 +28,10 @@ export interface ProductData {
     characteristics: any[];
     image_urls: string[];
     inStock: boolean;
+}
+
+export interface ProductData extends Omit<ProductDocument, "_id"> {
+  _id: string;
 }
 
 export interface SessionData {
