@@ -1,15 +1,16 @@
 "use client";
 
+import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { LoadingSpinner } from "../ui/spinner";
 import { HeartIcon } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useCartStore } from "@/store/useCartStore";
+import { LoadingSpinner } from "../ui/spinner";
 import { ProductData } from "@/interfaces/interfaces";
+import { useCartStore } from "@/store/useCartStore";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useProductStore } from "@/store/useProductStore";
-import { useSearchParams, useRouter } from "next/navigation";
 import {
   Pagination,
   PaginationContent,
@@ -20,15 +21,16 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export default function ProductList() {
+/**
+ * Handles paginated filtering logic that depends on search params
+ */
+function ProductPaginationController() {
   const {
     products,
     loading,
     filteredProducts,
     searchTerm,
-    setProducts,
     setFilteredProducts,
-    setLoading,
     filterProducts,
   } = useProductStore();
   const { addItemToCart, openCartModal } = useCartStore();
@@ -43,31 +45,14 @@ export default function ProductList() {
   const router = useRouter();
 
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        console.log("Trying to load products");
-        setFilteredProducts(products);
-        setTotalProducts(products.length);
-        setTotalPages(Math.ceil(products.length / productsPerPage));
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    }
-
-    loadProducts();
-  }, [productsPerPage]);
+    setFilteredProducts(products);
+    setTotalProducts(products.length);
+    setTotalPages(Math.ceil(products.length / productsPerPage));
+  }, [products, productsPerPage, setFilteredProducts]);
 
   useEffect(() => {
-    async function loadFilteredProducts() {
-      try {
-        console.log("Trying to load filtered products");
-        await filterProducts(Filters);
-      } catch (error) {
-        console.error("Error fetching filtered products:", error);
-      }
-    }
-    loadFilteredProducts();
-  }, [Filters, searchTerm]);
+    filterProducts(Filters);
+  }, [Filters, searchTerm, filterProducts]);
 
   useEffect(() => {
     const currentPage = Number(searchParams.get("page")) || 1;
@@ -85,7 +70,7 @@ export default function ProductList() {
     setPage(currentPage);
     setTotalPages(maxPage);
     setTotalProducts(filteredProducts.length);
-  }, [filteredProducts, searchParams, productsPerPage]);
+  }, [filteredProducts, searchParams, productsPerPage, router]);
 
   const handlePageChange = (newPage: number) => {
     router.push(`/?page=${newPage}`);
@@ -96,13 +81,11 @@ export default function ProductList() {
     openCartModal();
   };
 
-  const handleOpenProductPage = async (product: ProductData) => {
+  const handleOpenProductPage = (product: ProductData) => {
     router.push(`/?id=${product.product_id}&page=${page}`);
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-4">
@@ -113,87 +96,85 @@ export default function ProductList() {
             <p className="text-sm">Попробуйте изменить фильтры или поиск.</p>
           </div>
         ) : (
-        productsOnPage.map((product) => (
-          <Card
-            key={product.product_id}
-            className="group hover:shadow-xl transition-shadow duration-300 border border-gray-200"
-          >
-            <CardContent className="p-0">
-              {/* Image Container with Hover Effect */}
-              <div 
-                className="relative aspect-square overflow-hidden bg-gray-50 cursor-pointer"
-                onClick={() => handleOpenProductPage(product)}
-              >
-                <img
-                  src={product.image_urls[0]}
-                  alt={product.name}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-                {!product.inStock && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white font-semibold px-4 py-2 bg-primary rounded-md">
-                      Нет в наличии
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-4 space-y-3">
-                {/* Product Name */}
-                <h3 
-                  className="font-medium line-clamp-2 min-h-[2.5rem] cursor-pointer hover:text-primary transition-colors"
+          productsOnPage.map((product) => (
+            <Card
+              key={product.product_id}
+              className="group hover:shadow-xl transition-shadow duration-300 border border-gray-200"
+            >
+              <CardContent className="p-0">
+                <div
+                  className="relative aspect-square overflow-hidden bg-gray-50 cursor-pointer"
                   onClick={() => handleOpenProductPage(product)}
                 >
-                  {product.name}
-                </h3>
-
-                {/* Price */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-primary-800">
-                    {product.price} руб
-                  </span>
-                  {product.inStock && (
-                    <span className="text-sm text-primary-600 font-medium">
-                      В наличии
-                    </span>
+                  <Image
+                    src={product.image_urls[0]}
+                    alt={product.name}
+                    fill
+                    sizes="(min-width: 1024px) 25vw, 100vw"
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {!product.inStock && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white font-semibold px-4 py-2 bg-primary rounded-md">
+                        Нет в наличии
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-2">
-                  <Button 
-                    className="flex-1 bg-primary hover:bg-primary-700"
-                    onClick={() => handleAddItemToCart(product)}
-                    disabled={!product.inStock}
+                <div className="p-4 space-y-3">
+                  <h3
+                    className="font-medium line-clamp-2 min-h-[2.5rem] cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => handleOpenProductPage(product)}
                   >
-                    В корзину
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0 border-primary text-primary hover:bg-primary hover:text-white"
-                  >
-                    <HeartIcon className="h-5 w-5" />
-                  </Button>
+                    {product.name}
+                  </h3>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl font-bold text-primary-800">
+                      {product.price} руб
+                    </span>
+                    {product.inStock && (
+                      <span className="text-sm text-primary-600 font-medium">
+                        В наличии
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      className="flex-1 bg-primary hover:bg-primary-700"
+                      onClick={() => handleAddItemToCart(product)}
+                      disabled={!product.inStock}
+                    >
+                      В корзину
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0 border-primary text-primary hover:bg-primary hover:text-white"
+                    >
+                      <HeartIcon className="h-5 w-5" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        )))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
-      {/* Pagination */}
       {productsOnPage.length > 0 && (
         <div className="mt-8 mb-12">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
+                <PaginationPrevious
                   className="hover:bg-primary-50"
-                  onClick={() => handlePageChange(Math.max(page - 1, 1))} 
+                  onClick={() => handlePageChange(Math.max(page - 1, 1))}
                 />
               </PaginationItem>
+
               {totalPages > 5 && page - 1 > 3 && (
                 <>
                   <PaginationItem>
@@ -207,12 +188,10 @@ export default function ProductList() {
                   <PaginationEllipsis />
                 </>
               )}
+
               {[...Array(totalPages)]
                 .map((_, index) => index + 1)
-                .filter(
-                  (pageNumber) =>
-                    pageNumber >= page - 2 && pageNumber <= page + 2,
-                )
+                .filter((pageNumber) => pageNumber >= page - 2 && pageNumber <= page + 2)
                 .map((pageNumber) => (
                   <PaginationItem key={pageNumber}>
                     <PaginationLink
@@ -223,6 +202,7 @@ export default function ProductList() {
                     </PaginationLink>
                   </PaginationItem>
                 ))}
+
               {totalPages > 5 && page + 2 < totalPages && (
                 <>
                   <PaginationEllipsis />
@@ -236,16 +216,28 @@ export default function ProductList() {
                   </PaginationItem>
                 </>
               )}
+
               <PaginationItem>
-                <PaginationNext 
+                <PaginationNext
                   className="hover:bg-primary-50"
                   onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
                 />
               </PaginationItem>
             </PaginationContent>
-          </Pagination>  
+          </Pagination>
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Top-level export wrapped in Suspense to safely support useSearchParams()
+ */
+export default function ProductList() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <ProductPaginationController />
+    </Suspense>
   );
 }
