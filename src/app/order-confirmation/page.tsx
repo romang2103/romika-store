@@ -1,48 +1,70 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { LoadingSpinner } from "@/components/ui/spinner"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import Image from "next/image"
-import Link from "next/link"
-import { CheckCircle } from "lucide-react"
-import { getOrderUseCase } from "@/use-cases/orderUseCases" // Assume this function exists to fetch order details
-import type { OrderDetails } from "@/interfaces/interfaces" // Assume this type is defined
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { LoadingSpinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import Link from "next/link";
+import { CheckCircle } from "lucide-react";
+import { getOrderUseCase } from "@/use-cases/orderUseCases";
+import type { OrderDetails } from "@/interfaces/interfaces";
 
-export default function OrderConfirmationPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+// This subcomponent handles the logic that depends on URL search params.
+function OrderDetailsFetcher() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const orderId = searchParams.get("orderId")
+    const orderId = searchParams.get("orderId");
     if (!orderId) {
-      setError("No order ID provided")
-      setLoading(false)
-      return
+      setError("No order ID provided");
+      setLoading(false);
+      return;
     }
 
     const fetchOrderDetails = async () => {
       try {
-        const details = await getOrderUseCase(orderId)
-        setOrderDetails(details)
+        const details = await getOrderUseCase(orderId);
+        setOrderDetails(details);
       } catch (err) {
-        setError("Failed to fetch order details")
+        setError("Failed to fetch order details");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchOrderDetails()
-  }, [searchParams])
+    fetchOrderDetails();
+  }, [searchParams]);
 
-  if (loading) return <div className="container mx-auto max-w-3xl px-4 py-12"><LoadingSpinner/></div>
-  if (error) return <div className="container mx-auto max-w-3xl px-4 py-12">Error: {error}</div>
-  if (!orderDetails) return <div className="container mx-auto max-w-3xl px-4 py-12">No order details found</div>
+  if (loading) {
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-12">
+        Error: {error}
+      </div>
+    );
+  }
+
+  if (!orderDetails) {
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-12">
+        No order details found
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-12">
@@ -65,7 +87,9 @@ export default function OrderConfirmationPage() {
           </div>
           <div className="flex justify-between">
             <span>Метод доставки:</span>
-            <span className="font-medium">{orderDetails.deliveryMethod === "pickup" ? "Самовывоз" : "Курьер"}</span>
+            <span className="font-medium">
+              {orderDetails.deliveryMethod === "pickup" ? "Самовывоз" : "Курьер"}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Итого:</span>
@@ -95,7 +119,9 @@ export default function OrderConfirmationPage() {
               </Link>
               <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
             </div>
-            <div className="flex-shrink-0 font-medium">{(item.price * item.quantity).toFixed(2)} руб</div>
+            <div className="flex-shrink-0 font-medium">
+              {(item.price * item.quantity).toFixed(2)} руб
+            </div>
           </div>
         ))}
       </div>
@@ -111,6 +137,13 @@ export default function OrderConfirmationPage() {
         <Button onClick={() => router.push("/")}>Продолжить покупки</Button>
       </div>
     </div>
-  )
+  );
 }
 
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto max-w-3xl px-4 py-12"><LoadingSpinner /></div>}>
+      <OrderDetailsFetcher />
+    </Suspense>
+  );
+}

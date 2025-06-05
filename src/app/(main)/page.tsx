@@ -1,27 +1,27 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/TZu6KpKO4W2
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 "use client";
 
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductList from "@/components/ProductList/page";
 import ProductPage from "../product-page/page";
 import { useProductStore } from "@/store/useProductStore";
 import { useFilterStore } from "@/store/useFilterStore";
-import { useEffect } from "react";
 
-export default function MainPage() {
+// This component decides what to render based on the search params (e.g., ?id=123)
+function ProductViewSelector() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
-  
+
+  return productId ? <ProductPage /> : <ProductList />;
+}
+
+export default function MainPage() {
   const { loadFilterOptions } = useFilterStore();
   const { fetchProducts, loading } = useProductStore();
 
   useEffect(() => {
-    fetchProducts(); // Fetch product data when the page loads
-    loadFilterOptions(); // Fetch filter options when the page loads
+    fetchProducts();
+    loadFilterOptions();
   }, [fetchProducts]);
 
   if (loading) {
@@ -30,13 +30,11 @@ export default function MainPage() {
         <div className="spinner"></div>
         <style jsx>{`
           .spinner-container {
-            border: 1px solid black #f3f3f3;
             display: flex;
             justify-content: center;
-            // align-items: center;
             height: calc(100vh - 60px);
             width: 100vw;
-            margin-top: 60px; 
+            margin-top: 60px;
           }
           .spinner {
             border: 12px solid #f3f3f3;
@@ -50,15 +48,14 @@ export default function MainPage() {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
-        `}
-        </style>
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div>
-      {productId ? <ProductPage /> : <ProductList />}
-    </div>
+    <Suspense fallback={<div>Loading product view...</div>}>
+      <ProductViewSelector />
+    </Suspense>
   );
 }
