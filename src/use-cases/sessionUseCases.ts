@@ -1,10 +1,20 @@
 'use server';
 
-import { getSession, createSession } from "../data-access/sessionRepository";
+import { getSession, createSession, deleteSession, extendSession } from "../data-access/sessionRepository";
 import { v4 as uuidv4 } from "uuid";
 import { cookies } from 'next/headers';
 import { createCart } from "@/data-access/cartRepository";
 import { SessionData } from "@/interfaces/interfaces";
+
+const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+function setSessionCookie(sessionId: string) {
+    cookies().set("sessionId", sessionId, {
+        httpOnly: true,
+        path: "/",
+        maxAge: SESSION_DURATION_MS / 1000,
+    });
+}
 
 /**
  * @description Retrieves a session from storage based on an active session ID cookie,
@@ -33,7 +43,19 @@ export async function getSessionUseCase() {
             return null;
         }
 
-        return session;
+        const now = new Date();
+        if (session.expiresAt && session.expiresAt < now) {
+            console.log("Session expired");
+            await deleteSession(sessionId);
+            return null;
+        }
+
+        // Sliding expiration logic:
+        const newExpiry = new Date(now.getTime() + SESSION_DURATION_MS);
+        await extendSession(sessionId, newExpiry, now);
+        setSessionCookie(sessionId); // Refresh the browser cookie
+
+        return { ...session, expiresAt: newExpiry, lastActiveAt: now };
     } catch (error) {
         console.error('Error in getSessionUseCase:', error);
         throw error;
@@ -49,18 +71,25 @@ export async function getSessionUseCase() {
  * The structure and properties of this object are determined by the implementation
  * of `createSession`.
  */
+
 export async function createSessionUseCase() {
     try {
-        console.log('Creating session...');
-        // Create session id
         const sessionId = uuidv4();
-        // Create session document in database
-        const session = await createSession(sessionId);
-        // Create cart document in database with sessionId
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + SESSION_DURATION_MS);
+
+        const newSession: SessionData = {
+            sessionId,
+            createdAt: now,
+            expiresAt,
+            lastActiveAt: now,
+        };
+
+        const session = await createSession(newSession);
         await createCart(sessionId);
-        console.log(session);
-        // Set session id in cookie
-        cookies().set('sessionId', session.sessionId, { httpOnly: true, path: '/' });
+
+        setSessionCookie(sessionId);
+
         return session;
     } catch (error) {
         console.error('Error in createSessionUseCase:', error);

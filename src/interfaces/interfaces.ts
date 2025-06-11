@@ -31,12 +31,15 @@ export interface ProductDocument {
 }
 
 export interface ProductData extends Omit<ProductDocument, "_id"> {
-  _id: string;
+    _id: string;
 }
 
 export interface SessionData {
     _id?: string;
     sessionId: string;
+    createdAt?: Date;
+    expiresAt?: Date;
+    lastActiveAt?: Date;
 }
 
 export interface FilterOptionData {
