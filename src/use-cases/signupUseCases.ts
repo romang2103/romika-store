@@ -1,4 +1,4 @@
-import { findUserByEmail, createUser } from '@/data-access/users';
+import { findUserByEmail, createUser } from '@/data-access/userRepository';
 import { hash } from 'bcryptjs';
 
 /**

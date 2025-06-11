@@ -1,4 +1,4 @@
-import { findUserByEmail } from '@/data-access/users';
+import { findUserByEmail } from '@/data-access/userRepository';
 import { compare } from 'bcryptjs';
 
 // Interface for userData

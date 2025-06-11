@@ -1,11 +1,11 @@
 import { ProductData, ProductDocument } from "@/interfaces/interfaces";
-import { 
-  createProduct, 
-  updateProduct, 
-  deleteProduct 
-} from "@/data-access/products";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct
+} from "@/data-access/productRepository";
 
-export async function createProductUseCase(productData: ProductDocument): Promise<ProductDocument> {        
+export async function createProductUseCase(productData: ProductDocument): Promise<ProductDocument> {
   try {
     const newProduct = await createProduct(productData);
     return newProduct;

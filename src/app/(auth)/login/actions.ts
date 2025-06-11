@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod';
-import { loginUseCase } from '@/use-cases/login';
+import { loginUseCase } from '@/use-cases/loginUseCases';
 import { cookies } from 'next/headers';
 import { getOrCreateSession } from '@/lib/sessionService';
 
@@ -26,11 +26,11 @@ export async function loginAction(formData: FormData): Promise<{ message: string
 
     try {
         const response = await loginUseCase({ email, password });
-        
+
         if (response?.role) {
             // Get or create session
             await getOrCreateSession();
-            
+
             // Set authentication cookies with proper security options
             cookies().set('role', response.role, {
                 httpOnly: true,
@@ -48,10 +48,10 @@ export async function loginAction(formData: FormData): Promise<{ message: string
                 path: '/'
             });
 
-            return { 
-                message: response?.message ?? 'Login Successful', 
-                status: 200, 
-                role: response?.role 
+            return {
+                message: response?.message ?? 'Login Successful',
+                status: 200,
+                role: response?.role
             };
         }
         return { message: response?.message ?? 'Invalid role', status: 400 };
@@ -61,10 +61,10 @@ export async function loginAction(formData: FormData): Promise<{ message: string
 }
 
 export async function logoutAction() {
-  // Clear all auth-related cookies
-  cookies().delete('authenticated');
-  cookies().delete('role');
-  cookies().delete('sessionId');
-  
-  return { message: 'Logged out successfully', status: 200 };
+    // Clear all auth-related cookies
+    cookies().delete('authenticated');
+    cookies().delete('role');
+    cookies().delete('sessionId');
+
+    return { message: 'Logged out successfully', status: 200 };
 }

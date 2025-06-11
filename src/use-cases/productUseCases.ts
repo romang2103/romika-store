@@ -1,6 +1,6 @@
 'use server';
 
-import { fetchProducts } from "@/data-access/products";
+import { fetchProducts } from "@/data-access/productRepository";
 import { ProductData } from "@/interfaces/interfaces";
 
 export async function getAllProducts(): Promise<ProductData[]> {
