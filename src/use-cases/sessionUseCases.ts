@@ -49,13 +49,13 @@ export async function getSessionUseCase() {
  * The structure and properties of this object are determined by the implementation
  * of `createSession`.
  */
-export async function createSessionUseCase() {
+export async function createSessionUseCase(userId?: string) {
     try {
         console.log('Creating session...');
         // Create session id
         const sessionId = uuidv4();
         // Create session document in database
-        const session = await createSession(sessionId);
+        const session = await createSession(sessionId, userId);
         // Create cart document in database with sessionId
         await createCart(sessionId);
         console.log(session);

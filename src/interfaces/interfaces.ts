@@ -37,6 +37,7 @@ export interface ProductData extends Omit<ProductDocument, "_id"> {
 export interface SessionData {
     _id?: string;
     sessionId: string;
+    userId?: string;
 }
 
 export interface FilterOptionData {
