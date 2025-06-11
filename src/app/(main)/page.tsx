@@ -7,6 +7,8 @@ import ProductPage from "../product-page/page";
 import { useProductStore } from "@/store/useProductStore";
 import { useFilterStore } from "@/store/useFilterStore";
 import { getOrCreateSessionUseCase } from "@/use-cases/sessionUseCases";
+import { getCart } from "@/data-access/cartRepository";
+import { useCartStore } from "@/store/useCartStore";
 
 // This component decides what to render based on the search params (e.g., ?id=123)
 function ProductViewSelector() {
@@ -19,12 +21,14 @@ function ProductViewSelector() {
 export default function MainPage() {
   const { loadFilterOptions } = useFilterStore();
   const { fetchProducts, loading } = useProductStore();
+  const { loadCart } = useCartStore();
 
   useEffect(() => {
     fetchProducts();
     loadFilterOptions();
     const getSession = async () => {
       await getOrCreateSessionUseCase();
+      await loadCart();
     }
     getSession();
   }, [fetchProducts]);
