@@ -10,7 +10,7 @@ const formSchema = z.object({
     password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-export async function loginAction(formData: FormData): Promise<{ message: string, status: number, role?: string }> {
+export async function loginAction(formData: FormData): Promise<{ message: string, status: number, role?: string, userId?: string }> {
     const values = Object.fromEntries(formData.entries()) as Record<string, string>;
     const validatedFields = formSchema.safeParse(values);
 
@@ -26,10 +26,10 @@ export async function loginAction(formData: FormData): Promise<{ message: string
 
     try {
         const response = await loginUseCase({ email, password });
-        
+
         if (response?.role) {
-            // Get or create session
-            await getOrCreateSession();
+            // Get or create session and associate it with the user
+            await getOrCreateSession(response.userId);
             
             // Set authentication cookies with proper security options
             cookies().set('role', response.role, {

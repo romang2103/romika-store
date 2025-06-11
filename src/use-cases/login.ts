@@ -11,7 +11,7 @@ interface User extends UserLoginData {
     role: string;
 }
 
-export async function loginUseCase(userLoginData: UserLoginData): Promise<{ message: string, status: number, role?: string }> {
+export async function loginUseCase(userLoginData: UserLoginData): Promise<{ message: string, status: number, role?: string, userId?: string }> {
     try {
         const user = await findUserByEmail(userLoginData.email);
 
@@ -27,9 +27,9 @@ export async function loginUseCase(userLoginData: UserLoginData): Promise<{ mess
 
         switch (user.role) {
             case 'admin':
-                return { message: 'Admin login successful', status: 200, role: 'admin' };
+                return { message: 'Admin login successful', status: 200, role: 'admin', userId: user._id.toString() };
             case 'user':
-                return { message: 'User login successful', status: 200, role: 'user' };
+                return { message: 'User login successful', status: 200, role: 'user', userId: user._id.toString() };
             default:
                 return { message: 'Invalid role', status: 400 };
         }
