@@ -6,6 +6,7 @@ import ProductList from "@/components/ProductList/page";
 import ProductPage from "../product-page/page";
 import { useProductStore } from "@/store/useProductStore";
 import { useFilterStore } from "@/store/useFilterStore";
+import { getOrCreateSessionUseCase } from "@/use-cases/sessionUseCases";
 
 // This component decides what to render based on the search params (e.g., ?id=123)
 function ProductViewSelector() {
@@ -22,6 +23,10 @@ export default function MainPage() {
   useEffect(() => {
     fetchProducts();
     loadFilterOptions();
+    const getSession = async () => {
+      await getOrCreateSessionUseCase();
+    }
+    getSession();
   }, [fetchProducts]);
 
   if (loading) {
