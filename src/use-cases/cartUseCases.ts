@@ -1,11 +1,11 @@
 import { clearCart, createCart, getCart, getItemInCart, updateCart } from "@/data-access/cartRepository";
-import { getSessionUseCase } from "./sessionUseCases";
+import { getOrCreateSessionUseCase } from "./sessionUseCases";
 import { CartData, CartItemData, ProductData, SessionData } from "@/interfaces/interfaces";
 
 // Add item to cart
 export async function addItemToCartUseCase(product: ProductData, quantity: number) {
-    const session: SessionData | null = await getSessionUseCase();
-    const sessionId = session?.sessionId || '';
+    const session: SessionData = await getOrCreateSessionUseCase();
+    const sessionId = session.sessionId;
     console.log('sessionId: ', sessionId);
 
     let existingCart = await getCart(sessionId);
@@ -53,8 +53,8 @@ export async function addItemToCartUseCase(product: ProductData, quantity: numbe
 
 // Used to add and remove items inside the cart modal
 export async function updateItemInCartQuantityUseCase(productId: number, quantity: number) {
-    const session: SessionData | null = await getSessionUseCase();
-    const sessionId = session?.sessionId || '';
+    const session: SessionData = await getOrCreateSessionUseCase();
+    const sessionId = session.sessionId;
 
     const existingCart = await getCart(sessionId);
     if (!existingCart) throw new Error("Cart not found");
@@ -89,15 +89,15 @@ export async function updateItemInCartQuantityUseCase(productId: number, quantit
 
 // Clear cart
 export async function clearCartUseCase() {
-    const session: SessionData | null = await getSessionUseCase();
-    const sessionId = session?.sessionId || '';
+    const session: SessionData = await getOrCreateSessionUseCase();
+    const sessionId = session.sessionId;
     await clearCart(sessionId);
 }
 
 // Get cart
 export async function getCartUseCase() {
-    const session: SessionData | null = await getSessionUseCase();
-    const cart = await getCart(session?.sessionId || '');
+    const session: SessionData = await getOrCreateSessionUseCase();
+    const cart = await getCart(session.sessionId);
     return cart;
 }
 

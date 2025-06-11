@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { loginUseCase } from '@/use-cases/loginUseCases';
 import { cookies } from 'next/headers';
-import { getOrCreateSession } from '@/lib/sessionService';
+import { getOrCreateSessionUseCase } from '@/use-cases/sessionUseCases';
 
 const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -29,7 +29,7 @@ export async function loginAction(formData: FormData): Promise<{ message: string
 
         if (response?.role) {
             // Get or create session
-            await getOrCreateSession();
+            await getOrCreateSessionUseCase();
 
             // Set authentication cookies with proper security options
             cookies().set('role', response.role, {

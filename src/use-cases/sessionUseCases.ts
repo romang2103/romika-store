@@ -67,3 +67,12 @@ export async function createSessionUseCase() {
         throw error;
     }
 }
+
+// Retrieve the current session or create a new one if none exists
+export async function getOrCreateSessionUseCase(): Promise<SessionData> {
+    const session = await getSessionUseCase();
+    if (session) {
+        return session;
+    }
+    return await createSessionUseCase();
+}
