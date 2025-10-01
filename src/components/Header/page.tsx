@@ -6,7 +6,7 @@ import { JSX, SVGProps } from "react";
 
 export default function Header() {
   const router = useRouter();
-  const { openFilterModal } = useFilterStore();
+  const { openFilterModal, clearFilters } = useFilterStore();
   const { openCartModal, CartItems } = useCartStore();
 
   return (
@@ -21,7 +21,10 @@ export default function Header() {
               <MenuIcon className="w-6 h-6" />
             </button>
             <button 
-              onClick={() => router.push('/')}
+              onClick={() => {
+                clearFilters()
+                router.push('/')
+              }}
               className="text-xl font-bold hover:opacity-80 transition-opacity"
             >
               Romika

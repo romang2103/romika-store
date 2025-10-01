@@ -4,13 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Phone, Mail, MapPin, Truck, Shield, Award, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Truck, Shield, Award, Clock, Sofa, UtensilsCrossed, Shirt, Home, Sparkles, Lamp } from "lucide-react";
+import { useFilterStore } from "@/store/useFilterStore";
+import { useProductStore } from "@/store/useProductStore";
 
 export default function Homepage() {
   const router = useRouter();
+  const { filterOptions, addFilter, clearFilters } = useFilterStore();
+  const { filterProducts } = useProductStore();
 
   const handleShopNow = () => {
     router.push("/?page=1");
+  };
+
+  const handleCategoryClick = async (categoryId: number) => {
+    await clearFilters();
+    await addFilter(categoryId);
+    router.push("/?page=1");
+  };
+
+  // Map category names to icons
+  const getCategoryIcon = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
+    if (name.includes("мебель") || name.includes("furniture")) return <Sofa className="h-10 w-10" />;
+    if (name.includes("посуда") || name.includes("kitchen") || name.includes("utensils")) return <UtensilsCrossed className="h-10 w-10" />;
+    if (name.includes("текстиль") || name.includes("textile") || name.includes("одежда")) return <Shirt className="h-10 w-10" />;
+    if (name.includes("декор") || name.includes("decor")) return <Sparkles className="h-10 w-10" />;
+    if (name.includes("освещение") || name.includes("light") || name.includes("lamp")) return <Lamp className="h-10 w-10" />;
+    return <Home className="h-10 w-10" />; // Default icon
   };
 
   const features = [
@@ -90,8 +111,38 @@ export default function Homepage() {
         </div>
       </section>
 
+      {/* Categories Section */}
+      <section className="min-h-screen flex items-center py-20 px-4 bg-gradient-to-br from-gray-50 via-white to-primary-50">
+        <div className="container mx-auto max-w-7xl w-full">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Категории товаров
+            </h2>
+            <p className="text-lg text-gray-600">
+              Выберите категорию и найдите все необходимое для вашего дома
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filterOptions.map((category) => (
+              <Card
+                key={category.id}
+                className="cursor-pointer hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-200 group h-full bg-white/80 backdrop-blur-sm border-2"
+                onClick={() => handleCategoryClick(category.id)}
+              >
+                <CardHeader className="text-center p-8 h-full flex flex-col items-center justify-center">
+                  <div className="flex justify-center mb-4 text-primary group-hover:scale-110 transition-transform bg-primary-50 rounded-full p-4">
+                    {getCategoryIcon(category.name)}
+                  </div>
+                  <CardTitle className="text-base md:text-lg font-semibold">{category.name}</CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
