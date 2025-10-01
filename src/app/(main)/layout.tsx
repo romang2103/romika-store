@@ -23,7 +23,7 @@ function LayoutController({ children }: { children: React.ReactNode }) {
   const { isCartModalOpen, openCartModal, closeCartModal } = useCartStore();
 
   const shouldShowHeader = !NO_HEADER_ROUTES.includes(pathname);
-  const shouldShowSearchBar = !searchParams.has("id");
+  const shouldShowSearchBar = searchParams.has("page") && !searchParams.has("id");
 
   return (
     <div className="min-h-screen bg-gray-100">

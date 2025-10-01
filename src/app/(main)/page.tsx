@@ -4,18 +4,29 @@ import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductList from "@/components/ProductList/page";
 import ProductPage from "../product-page/page";
+import Homepage from "@/components/Homepage/page";
 import { useProductStore } from "@/store/useProductStore";
 import { useFilterStore } from "@/store/useFilterStore";
 import { getOrCreateSessionUseCase } from "@/use-cases/sessionUseCases";
 import { getCart } from "@/data-access/cartRepository";
 import { useCartStore } from "@/store/useCartStore";
 
-// This component decides what to render based on the search params (e.g., ?id=123)
+// This component decides what to render based on the search params
+// - If ?id=123 -> Show product page
+// - If ?page=X -> Show product list
+// - Otherwise -> Show homepage
 function ProductViewSelector() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
+  const page = searchParams.get("page");
 
-  return productId ? <ProductPage /> : <ProductList />;
+  if (productId) {
+    return <ProductPage />;
+  } else if (page) {
+    return <ProductList />;
+  } else {
+    return <Homepage />;
+  }
 }
 
 export default function MainPage() {
