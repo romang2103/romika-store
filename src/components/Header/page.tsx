@@ -1,5 +1,6 @@
 import { useCartStore } from "@/store/useCartStore";
 import { useFilterStore } from "@/store/useFilterStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { JSX, SVGProps } from "react";
 
@@ -8,6 +9,12 @@ export default function Header() {
   const router = useRouter();
   const { openFilterModal, clearFilters } = useFilterStore();
   const { openCartModal, CartItems } = useCartStore();
+  const { isAuthenticated, role, logout } = useAuthStore();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-primary text-white shadow-md">
@@ -32,10 +39,31 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {isAuthenticated && (
+              <div className="flex items-center space-x-2 mr-2">
+                <span className="text-sm font-medium">
+                  {role === 'admin' ? 'Admin' : 'User'}
+                </span>
+                {role === 'admin' && (
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-sm px-3 py-1 bg-white text-primary rounded hover:bg-gray-100 transition-colors"
+                  >
+                    Dashboard
+                  </button>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="text-sm px-3 py-1 bg-white text-primary rounded hover:bg-gray-100 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
             <button className="p-2 hover:bg-primary-700 rounded-full transition-colors">
               <UserIcon className="w-6 h-6" />
             </button>
-            <button 
+            <button
               onClick={openCartModal}
               className="p-2 hover:bg-primary-700 rounded-full transition-colors relative"
             >
