@@ -398,7 +398,7 @@ export default function ProductsManagement() {
                                             <div className="flex flex-wrap gap-1">
                                                 {product.categories?.slice(0, 2).map((category, idx) => (
                                                     <Badge key={idx} variant="secondary" className="text-xs">
-                                                        {categories[category]?.name || category}
+                                                        {categories.find(cat => cat.id === Number(category))?.name || category}
                                                     </Badge>
                                                 ))}
                                                 {product.categories?.length > 2 && (
