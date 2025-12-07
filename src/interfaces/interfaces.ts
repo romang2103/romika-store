@@ -48,6 +48,12 @@ export interface FilterOptionData {
     name: string;
 }
 
+export interface CategoryData {
+    _id: ObjectId | string;
+    id: number;
+    name: string;
+}
+
 export interface ContactInfo {
     phoneNumber: string;
     email: string;
