@@ -33,7 +33,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
-  const { setAuth } = useAuthStore();
+  const { setAuth, isAuthenticated, role } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,13 +50,17 @@ export default function LoginForm() {
       Object.entries(values).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      
+
       const response = await loginAction(formData);
 
       if (response.status === 200) {
         setAuth(true, response.role ?? null);
+
+        // Redirect to dashboard for admins, home for regular users
         const route = response.role === 'admin' ? '/dashboard' : '/';
-        router.push(route);
+
+        // Use replace instead of push to prevent going back to login
+        router.replace(route);
       } else {
         setErrorMessage(response.message);
       }

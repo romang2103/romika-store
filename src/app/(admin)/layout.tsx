@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import Link from "next/link";
 
 export default function AdminLayout({
   children,
@@ -10,22 +10,12 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, role, logout } = useAuthStore();
-
-  useEffect(() => {
-    if (!isAuthenticated || role !== 'admin') {
-      router.push('/login');
-    }
-  }, [isAuthenticated, role, router]);
+  const { logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
-
-  if (!isAuthenticated || role !== 'admin') {
-    return null;
-  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -35,30 +25,36 @@ export default function AdminLayout({
           <h2 className="text-xl font-bold">Admin Dashboard</h2>
         </div>
         <nav className="mt-4">
-          <a
-            href="/admin/dashboard"
+          <Link
+            href="/dashboard"
             className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
           >
             Dashboard
-          </a>
-          <a
-            href="/admin/products"
+          </Link>
+          <Link
+            href="/"
+            className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+          >
+            View Store
+          </Link>
+          <Link
+            href="/products"
             className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
           >
             Products
-          </a>
-          <a
+          </Link>
+          <Link
             href="/admin/orders"
             className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
           >
             Orders
-          </a>
-          <a
+          </Link>
+          <Link
             href="/admin/users"
             className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
           >
             Users
-          </a>
+          </Link>
           <button
             onClick={handleLogout}
             className="block w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-100"

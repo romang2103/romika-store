@@ -68,3 +68,11 @@ export async function logoutAction() {
 
     return { message: 'Logged out successfully', status: 200 };
 }
+
+export async function getAuthStatus() {
+    const cookieStore = await cookies();
+    return {
+        isAuthenticated: cookieStore.get('authenticated')?.value === 'true',
+        role: cookieStore.get('role')?.value || null
+    };
+}
