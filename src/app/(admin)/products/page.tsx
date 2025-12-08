@@ -21,7 +21,8 @@ import { toast } from "sonner"
 import { Label } from "@/components/ui/label";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, Search, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, X, Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProductFormData {
     product_id: number;
@@ -45,6 +46,8 @@ export default function ProductsManagement() {
     const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+    const [showFilters, setShowFilters] = useState(false);
     const [formData, setFormData] = useState<ProductFormData>({
         product_id: 0,
         name: "",
@@ -273,11 +276,31 @@ export default function ProductsManagement() {
         }));
     };
 
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.some(desc => desc.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        product.categories?.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const toggleCategoryFilter = (categoryId: number) => {
+        setSelectedCategoryIds(prev =>
+            prev.includes(categoryId)
+                ? prev.filter(id => id !== categoryId)
+                : [...prev, categoryId]
+        );
+    };
+
+    const clearCategoryFilters = () => {
+        setSelectedCategoryIds([]);
+    };
+
+    const filteredProducts = products.filter(product => {
+        // Text search filter
+        const matchesSearch = searchQuery === "" ||
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.description?.some(desc => desc.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            product.categories?.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        // Category filter
+        const matchesCategory = selectedCategoryIds.length === 0 ||
+            product.categories?.some(cat => selectedCategoryIds.includes(Number(cat)));
+
+        return matchesSearch && matchesCategory;
+    });
 
     if (loading) {
         return (
@@ -301,7 +324,7 @@ export default function ProductsManagement() {
             </div>
 
             <div className="bg-white shadow rounded-lg">
-                <div className="p-4 border-b">
+                <div className="p-4 border-b space-y-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
@@ -312,6 +335,60 @@ export default function ProductsManagement() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="flex items-center gap-2"
+                        >
+                            <Filter className="w-4 h-4" />
+                            Filter by Category
+                            {selectedCategoryIds.length > 0 && (
+                                <Badge variant="secondary" className="ml-1">
+                                    {selectedCategoryIds.length}
+                                </Badge>
+                            )}
+                        </Button>
+                        {selectedCategoryIds.length > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={clearCategoryFilters}
+                                className="flex items-center gap-1"
+                            >
+                                <X className="w-4 h-4" />
+                                Clear filters
+                            </Button>
+                        )}
+                    </div>
+
+                    {showFilters && (
+                        <div className="p-4 bg-gray-50 rounded-lg border">
+                            <h3 className="text-sm font-medium text-gray-700 mb-3">Filter by Categories</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                {categories.map((category) => (
+                                    <div key={category.id} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`category-${category.id}`}
+                                            checked={selectedCategoryIds.includes(category.id)}
+                                            onCheckedChange={() => toggleCategoryFilter(category.id)}
+                                        />
+                                        <label
+                                            htmlFor={`category-${category.id}`}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                        >
+                                            {category.name}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                            {categories.length === 0 && (
+                                <p className="text-sm text-gray-500">No categories available</p>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="overflow-x-auto">
