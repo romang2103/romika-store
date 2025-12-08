@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ProductData, ProductDocument } from "@/interfaces/interfaces";
+import { CategoryData, ProductData, ProductDocument } from "@/interfaces/interfaces";
 import { useProductStore } from "@/store/useProductStore";
 import { useCategoryStore } from '@/store/useCategoryStore';
 import {
@@ -11,6 +11,10 @@ import {
   updateProductUseCase,
   deleteProductUseCase
 } from "@/use-cases/productManagementUseCases";
+import {
+  createCategoryUseCase,
+  deleteCategoryUseCase
+} from "@/use-cases/categoryUseCases";
 import {
   Dialog,
   DialogContent,
@@ -91,6 +95,44 @@ export default function ProductsManagement() {
         }
     };
 
+    const cleanupOrphanedCategories = async (categoriesToCheck: string[]) => {
+        try {
+            // Get fresh products data from the store
+            const currentProducts = useProductStore.getState().products;
+
+            console.log('Checking categories for cleanup:', categoriesToCheck);
+            console.log('Current products count:', currentProducts.length);
+
+            for (const categoryId of categoriesToCheck) {
+                // Check if this category is used by any product
+                const isUsedByAnyProduct = currentProducts.some(product =>
+                    product.categories?.includes(categoryId)
+                );
+
+                console.log(`Category ${categoryId} is used by any product:`, isUsedByAnyProduct);
+
+                // If not used by any product, delete it
+                if (!isUsedByAnyProduct) {
+                    const categoryToDelete = categories.find(cat => cat.id === Number(categoryId));
+                    if (categoryToDelete) {
+                        console.log('Deleting category:', categoryToDelete);
+                        await deleteCategoryUseCase(categoryToDelete.id);
+
+                        // Remove from selected filters if it was selected
+                        setSelectedCategoryIds(prev => prev.filter(id => id !== categoryToDelete.id));
+
+                        toast.success(`Category "${categoryToDelete.name}" deleted (no longer used)`);
+                    } else {
+                        console.log(`Category with ID ${categoryId} not found in categories list`);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error cleaning up orphaned categories:', error);
+            toast.error("Error cleaning up categories");
+        }
+    };
+
     const handleAddNew = () => {
         setSelectedProduct(null);
         setIsSubmitting(false);
@@ -132,11 +174,24 @@ export default function ProductsManagement() {
     const handleDelete = async (productId: number) => {
         if (confirm("Are you sure you want to delete this product?")) {
             try {
+                // Get the product's categories before deleting
+                const productToDelete = products.find(p => p.product_id === productId);
+                const categoriesToCheck = productToDelete?.categories || [];
+
                 await deleteProductUseCase(productId);
-                await loadProducts();
-                toast.success("Product deleted successfully")
+                await fetchProducts();
+
+                // Check if any categories are now orphaned
+                if (categoriesToCheck.length > 0) {
+                    // Small delay to ensure store is updated
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await cleanupOrphanedCategories(categoriesToCheck);
+                    await loadCategories();
+                }
+
+                toast.success("Product deleted successfully");
             } catch (error) {
-                toast.error("Failed to delete product")
+                toast.error("Failed to delete product");
             }
         }
     };
@@ -157,6 +212,14 @@ export default function ProductsManagement() {
                 inStock: formData.quantity > 0,
             };
 
+            // Track removed categories if this is an update
+            let removedCategories: string[] = [];
+            if (selectedProduct) {
+                removedCategories = selectedProduct.categories?.filter(
+                    cat => !formData.categories.includes(cat)
+                ) || [];
+            }
+
             if (selectedProduct) {
                 await updateProductUseCase(selectedProduct.product_id, productData);
                 toast.success("Product updated successfully");
@@ -165,7 +228,17 @@ export default function ProductsManagement() {
                 toast.success("Product created successfully");
             }
 
-            await loadProducts();
+            // Reload products first to get the updated state
+            await fetchProducts();
+
+            // After saving, check if any removed categories are now orphaned
+            if (removedCategories.length > 0) {
+                // Small delay to ensure store is updated
+                await new Promise(resolve => setTimeout(resolve, 100));
+                await cleanupOrphanedCategories(removedCategories);
+            }
+
+            await loadCategories();
             setIsModalOpen(false);
         } catch (error) {
             toast.error(`Failed to ${selectedProduct ? 'update' : 'create'} product`);
@@ -219,17 +292,45 @@ export default function ProductsManagement() {
         }));
     };
 
-    const addCategory = () => {
-        if (categoryInput.trim() && !formData.categories.includes(categoryInput.trim())) {
+    const addCategory = async () => {
+        const categoryName = categoryInput.trim();
+        if (!categoryName) {
+            return;
+        }
+
+        try {
+            // Check if category already exists in the store
+            let existingCategory = categories.find(cat => cat.name === categoryName);
+
+            if (!existingCategory) {
+                // Create new category in database
+                const newId = categories.length > 0 ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+                const newCategory: CategoryData = await createCategoryUseCase({ id: newId, name: categoryName });
+                await loadCategories(); // Reload categories to get the new one
+                existingCategory = newCategory;
+                toast.success(`Category "${categoryName}" created`);
+            }
+
+            // Check if category ID is already in the form data
+            const categoryIdStr = existingCategory.id.toString();
+            if (formData.categories.includes(categoryIdStr)) {
+                return;
+            }
+
+            // Add category ID to product form (categories are stored as string IDs)
             setFormData(prev => ({
                 ...prev,
-                categories: [...prev.categories, categoryInput.trim()]
+                categories: [...prev.categories, categoryIdStr]
             }));
             setCategoryInput("");
+        } catch (error) {
+            toast.error("Failed to add category");
         }
     };
 
     const removeCategory = (category: string) => {
+        // Remove category from product form
+        // The category will be automatically deleted from database if orphaned when the product is saved
         setFormData(prev => ({
             ...prev,
             categories: prev.categories.filter(c => c !== category)
@@ -289,11 +390,10 @@ export default function ProductsManagement() {
     };
 
     const filteredProducts = products.filter(product => {
-        // Text search filter
+        // Text search filter - search by product ID and name only
         const matchesSearch = searchQuery === "" ||
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.description?.some(desc => desc.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            product.categories?.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()));
+            product.product_id.toString().includes(searchQuery) ||
+            product.name.toLowerCase().includes(searchQuery.toLowerCase());
 
         // Category filter
         const matchesCategory = selectedCategoryIds.length === 0 ||
@@ -329,7 +429,7 @@ export default function ProductsManagement() {
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
                             type="search"
-                            placeholder="Search products by name, description, or category..."
+                            placeholder="Search products by ID or name..."
                             className="pl-10"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -641,7 +741,12 @@ export default function ProductsManagement() {
                                     value={categoryInput}
                                     onChange={(e) => setCategoryInput(e.target.value)}
                                     placeholder="Add category"
-                                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            addCategory();
+                                        }
+                                    }}
                                 />
                                 <Button type="button" onClick={addCategory} variant="outline">
                                     Add
@@ -650,7 +755,7 @@ export default function ProductsManagement() {
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {formData.categories.map((category, index) => (
                                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                                        {category}
+                                        {categories.find(cat => cat.id === Number(category))?.name || category}
                                         <X
                                             className="w-3 h-3 cursor-pointer"
                                             onClick={() => removeCategory(category)}
